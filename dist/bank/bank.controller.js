@@ -52,29 +52,29 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], BankController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Get)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], BankController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Patch)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_bank_dto_1.UpdateBankDto]),
     __metadata("design:returntype", void 0)
 ], BankController.prototype, "update", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    (0, common_1.Delete)(":id"),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], BankController.prototype, "remove", null);
 exports.BankController = BankController = __decorate([
-    (0, common_1.Controller)('bank'),
+    (0, common_1.Controller)("api/bank"),
     __metadata("design:paramtypes", [bank_service_1.BankService])
 ], BankController);
 //# sourceMappingURL=bank.controller.js.map

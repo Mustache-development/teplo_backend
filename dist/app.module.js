@@ -8,18 +8,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const mongoose_1 = require("@nestjs/mongoose");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
 const admin_module_1 = require("./admin/admin.module");
 const posts_module_1 = require("./posts/posts.module");
 const bank_module_1 = require("./bank/bank.module");
+const token_module_1 = require("./token/token.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [auth_module_1.AuthModule, admin_module_1.AdminModule, posts_module_1.PostsModule, bank_module_1.BankModule],
+        imports: [
+            mongoose_1.MongooseModule.forRoot("mongodb+srv://test_education:Fm5xGy5NlfsDXhu0@cluster0.svrxsep.mongodb.net/teplo"),
+            auth_module_1.AuthModule,
+            admin_module_1.AdminModule,
+            posts_module_1.PostsModule,
+            bank_module_1.BankModule,
+            token_module_1.TokenModule,
+        ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
