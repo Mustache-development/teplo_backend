@@ -20,6 +20,8 @@ const id_telegram_schema_1 = require("../admin/schemas/id-telegram.schema");
 const token_telegram_bot_schema_1 = require("../admin/schemas/token-telegram-bot.schema");
 const telegraf_1 = require("telegraf");
 const post_schema_1 = require("./schemas/post.schema");
+const fs = require("fs");
+const axios_1 = require("axios");
 let PostsService = class PostsService {
     constructor(idTelegramModel, tokenTelegramBotModel, postsModel) {
         this.idTelegramModel = idTelegramModel;
@@ -31,7 +33,6 @@ let PostsService = class PostsService {
         this.bot.on("channel_post", async (ctx) => {
             try {
                 if (this.isProcessing) {
-                    console.log("Already processing. Waiting...");
                     while (this.isProcessing) {
                         await new Promise((resolve) => setTimeout(resolve, 1000));
                     }
@@ -46,22 +47,67 @@ let PostsService = class PostsService {
                             mediagroup: mediagroup,
                         })
                             .exec();
-                        console.log(checkMediaGroup);
                         if (checkMediaGroup) {
                             const check = await ctx.telegram.getFileLink(photo[photo.length - 1].file_id);
-                            await this.postsModel.findOneAndUpdate({ _id: checkMediaGroup._id }, { photo: [...checkMediaGroup.photo, check.href] });
+                            const response = await axios_1.default.get(check.href, {
+                                responseType: "arraybuffer",
+                            });
+                            if (!fs.existsSync("upload")) {
+                                fs.mkdirSync("upload");
+                            }
+                            fs.writeFileSync(`upload/${photo[photo.length - 1].file_unique_id}.jpg`, response.data);
+                            await this.postsModel
+                                .findOneAndUpdate({ _id: checkMediaGroup._id }, {
+                                photo: [
+                                    ...checkMediaGroup.photo,
+                                    `${process.env.SERVER_URL}/upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+                                ],
+                            })
+                                .exec();
                         }
                         else {
                             const check = await ctx.telegram.getFileLink(photo[photo.length - 1].file_id);
+                            const response = await axios_1.default.get(check.href, {
+                                responseType: "arraybuffer",
+                            });
+                            if (!fs.existsSync("upload")) {
+                                fs.mkdirSync("upload");
+                            }
+                            fs.writeFileSync(`upload/${photo[photo.length - 1].file_unique_id}.jpg`, response.data);
                             await this.postsModel.create({
-                                photo: [check.href],
+                                photo: [
+                                    `${process.env.SERVER_URL}/upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+                                ],
                                 mediagroup: mediagroup,
-                                text: ctx.update.channel_post?.photo.caption
-                                    ? ctx.update.channel_post?.photo.caption
+                                text: ctx.update.channel_post?.caption
+                                    ? ctx.update.channel_post?.caption
                                     : "",
                             });
                         }
                     }
+                    else {
+                        const check = await ctx.telegram.getFileLink(photo[photo.length - 1].file_id);
+                        const response = await axios_1.default.get(check.href, {
+                            responseType: "arraybuffer",
+                        });
+                        if (!fs.existsSync("upload")) {
+                            fs.mkdirSync("upload");
+                        }
+                        fs.writeFileSync(`upload/${photo[photo.length - 1].file_unique_id}.jpg`, response.data);
+                        await this.postsModel.create({
+                            photo: [
+                                `${process.env.SERVER_URL}/upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+                            ],
+                            text: ctx.update.channel_post?.caption
+                                ? ctx.update.channel_post?.caption
+                                : "",
+                        });
+                    }
+                }
+                else {
+                    await this.postsModel.create({
+                        text: ctx.update.channel_post.text,
+                    });
                 }
             }
             catch (err) {

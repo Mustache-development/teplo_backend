@@ -6,6 +6,8 @@ import { TokenTelegramBot } from "src/admin/schemas/token-telegram-bot.schema";
 import { Composer, Context, Telegraf, session } from "telegraf";
 import { message } from "telegraf/filters";
 import { Posts } from "./schemas/post.schema";
+import * as fs from "fs";
+import axios from "axios";
 
 @Injectable()
 export class PostsService {
@@ -27,10 +29,8 @@ export class PostsService {
     this.bot.on("channel_post", async (ctx) => {
       try {
         if (this.isProcessing) {
-          console.log("Already processing. Waiting...");
           while (this.isProcessing) {
-            // Ждем завершения предыдущей обработки
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // Пауза в 1 секунду
+            await new Promise((resolve) => setTimeout(resolve, 1000));
           }
         }
 
@@ -46,29 +46,101 @@ export class PostsService {
                 mediagroup: mediagroup,
               })
               .exec();
-            console.log(checkMediaGroup);
 
             if (checkMediaGroup) {
               const check = await ctx.telegram.getFileLink(
                 photo[photo.length - 1].file_id
               );
-              await this.postsModel.findOneAndUpdate(
-                { _id: checkMediaGroup._id },
-                { photo: [...checkMediaGroup.photo, check.href] }
+
+              const response = await axios.get(check.href, {
+                responseType: "arraybuffer",
+              });
+
+              if (!fs.existsSync("upload")) {
+                fs.mkdirSync("upload");
+              }
+
+              fs.writeFileSync(
+                `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+                response.data
               );
+
+              await this.postsModel
+                .findOneAndUpdate(
+                  { _id: checkMediaGroup._id },
+                  {
+                    photo: [
+                      ...checkMediaGroup.photo,
+                      `${process.env.SERVER_URL}/upload/${
+                        photo[photo.length - 1].file_unique_id
+                      }.jpg`,
+                    ],
+                  }
+                )
+                .exec();
             } else {
               const check = await ctx.telegram.getFileLink(
                 photo[photo.length - 1].file_id
               );
+
+              const response = await axios.get(check.href, {
+                responseType: "arraybuffer",
+              });
+
+              if (!fs.existsSync("upload")) {
+                fs.mkdirSync("upload");
+              }
+
+              fs.writeFileSync(
+                `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+                response.data
+              );
+
               await this.postsModel.create({
-                photo: [check.href],
+                photo: [
+                  `${process.env.SERVER_URL}/upload/${
+                    photo[photo.length - 1].file_unique_id
+                  }.jpg`,
+                ],
                 mediagroup: mediagroup,
-                text: (ctx.update.channel_post as any)?.photo.caption
-                  ? (ctx.update.channel_post as any)?.photo.caption
+                text: (ctx.update.channel_post as any)?.caption
+                  ? (ctx.update.channel_post as any)?.caption
                   : "",
               });
             }
+          } else {
+            const check = await ctx.telegram.getFileLink(
+              photo[photo.length - 1].file_id
+            );
+
+            const response = await axios.get(check.href, {
+              responseType: "arraybuffer",
+            });
+
+            if (!fs.existsSync("upload")) {
+              fs.mkdirSync("upload");
+            }
+
+            fs.writeFileSync(
+              `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+              response.data
+            );
+
+            await this.postsModel.create({
+              photo: [
+                `${process.env.SERVER_URL}/upload/${
+                  photo[photo.length - 1].file_unique_id
+                }.jpg`,
+              ],
+              text: (ctx.update.channel_post as any)?.caption
+                ? (ctx.update.channel_post as any)?.caption
+                : "",
+            });
           }
+        } else {
+          await this.postsModel.create({
+            text: (ctx.update.channel_post as any).text,
+          });
         }
       } catch (err) {
         console.log(err);
