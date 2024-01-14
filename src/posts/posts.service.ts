@@ -11,6 +11,7 @@ import { Posts } from "./schemas/post.schema";
 export class PostsService {
   private bot: Telegraf;
   private stage: Composer<Context>;
+  private isProcessing: boolean = false;
   constructor(
     @InjectModel(IdTelegram.name)
     private idTelegramModel: mongoose.Model<IdTelegram>,
@@ -25,6 +26,15 @@ export class PostsService {
 
     this.bot.on("channel_post", async (ctx) => {
       try {
+        if (this.isProcessing) {
+          console.log("Already processing. Waiting...");
+          while (this.isProcessing) {
+            // Ждем завершения предыдущей обработки
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Пауза в 1 секунду
+          }
+        }
+
+        this.isProcessing = true;
         if ((ctx.update.channel_post as any)?.photo) {
           const photo = (ctx.update.channel_post as any)?.photo;
 
@@ -62,6 +72,8 @@ export class PostsService {
         }
       } catch (err) {
         console.log(err);
+      } finally {
+        this.isProcessing = false;
       }
     });
     this.bot.launch();

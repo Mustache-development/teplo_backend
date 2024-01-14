@@ -25,10 +25,18 @@ let PostsService = class PostsService {
         this.idTelegramModel = idTelegramModel;
         this.tokenTelegramBotModel = tokenTelegramBotModel;
         this.postsModel = postsModel;
+        this.isProcessing = false;
         this.bot = new telegraf_1.Telegraf("6731433333:AAExxd3kriL55m90XQcN53gCmdXhtImxHZY");
         this.bot.start((ctx) => ctx.reply("Welcome"));
         this.bot.on("channel_post", async (ctx) => {
             try {
+                if (this.isProcessing) {
+                    console.log("Already processing. Waiting...");
+                    while (this.isProcessing) {
+                        await new Promise((resolve) => setTimeout(resolve, 1000));
+                    }
+                }
+                this.isProcessing = true;
                 if (ctx.update.channel_post?.photo) {
                     const photo = ctx.update.channel_post?.photo;
                     if (ctx.update.channel_post?.media_group_id) {
@@ -58,6 +66,9 @@ let PostsService = class PostsService {
             }
             catch (err) {
                 console.log(err);
+            }
+            finally {
+                this.isProcessing = false;
             }
         });
         this.bot.launch();
