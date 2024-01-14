@@ -10,11 +10,26 @@ exports.AdminModule = void 0;
 const common_1 = require("@nestjs/common");
 const admin_service_1 = require("./admin.service");
 const admin_controller_1 = require("./admin.controller");
+const token_module_1 = require("../token/token.module");
+const mongoose_1 = require("@nestjs/mongoose");
+const auth_schema_1 = require("../auth/schemas/auth.schema");
+const id_telegram_schema_1 = require("./schemas/id-telegram.schema");
+const token_telegram_bot_schema_1 = require("./schemas/token-telegram-bot.schema");
+const token_monobank_schema_1 = require("./schemas/token-monobank.schema");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
 exports.AdminModule = AdminModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            token_module_1.TokenModule,
+            mongoose_1.MongooseModule.forFeature([
+                { name: auth_schema_1.Auth.name, schema: auth_schema_1.AuthSchema },
+                { name: id_telegram_schema_1.IdTelegram.name, schema: id_telegram_schema_1.IdTelegramSchema },
+                { name: token_telegram_bot_schema_1.TokenTelegramBot.name, schema: token_telegram_bot_schema_1.TokenTelegramBotSchema },
+                { name: token_monobank_schema_1.TokenMonobank.name, schema: token_monobank_schema_1.TokenMonobankSchema },
+            ]),
+        ],
         controllers: [admin_controller_1.AdminController],
         providers: [admin_service_1.AdminService],
     })

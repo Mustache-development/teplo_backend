@@ -21,27 +21,13 @@
 /// <reference types="mongoose/types/utility" />
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
+/// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
-import mongoose from "mongoose";
-import { IdTelegram } from "src/admin/schemas/id-telegram.schema";
-import { TokenTelegramBot } from "src/admin/schemas/token-telegram-bot.schema";
-import { Posts } from "./schemas/post.schema";
-export declare class PostsService {
-    private idTelegramModel;
-    private tokenTelegramBotModel;
-    private postsModel;
-    private bot;
-    private stage;
-    constructor(idTelegramModel: mongoose.Model<IdTelegram>, tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>, postsModel: mongoose.Model<Posts>);
-    getPosts(): Promise<{
-        code: number;
-        posts: (mongoose.Document<unknown, {}, Posts> & Posts & {
-            _id: mongoose.Types.ObjectId;
-        })[];
-        message?: undefined;
-    } | {
-        code: number;
-        message: string;
-        posts?: undefined;
-    }>;
+export declare class IdTelegram {
+    telegram: string;
 }
+export declare const IdTelegramSchema: import("mongoose").Schema<IdTelegram, import("mongoose").Model<IdTelegram, any, any, any, import("mongoose").Document<unknown, any, IdTelegram> & IdTelegram & {
+    _id: import("mongoose").Types.ObjectId;
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, IdTelegram, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<IdTelegram>> & import("mongoose").FlatRecord<IdTelegram> & {
+    _id: import("mongoose").Types.ObjectId;
+}>;

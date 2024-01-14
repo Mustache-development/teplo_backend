@@ -7,11 +7,11 @@ import { Request } from "express";
 
 @Injectable()
 export class TokenService {
-  private jwtService: JwtService;
-  private secret: "fsdfsdfsdfsdfd";
-  private timeToken: 100000;
+  private secret: string = "fsdfsdfsdfsdfd";
+  private timeToken: number = 100000;
 
   constructor(
+    private readonly jwtService: JwtService,
     @InjectModel(TokenBlacklist.name)
     private tokenBlacklistModel: mongoose.Model<TokenBlacklist>
   ) {}
@@ -25,15 +25,25 @@ export class TokenService {
     });
   }
 
-  async validateJwtToken(token: string) {
-    if (!token) return false;
+  async validateJwtToken(
+    token: string
+  ): Promise<{ authorization: boolean; data: { email: string } }> {
+    if (!token)
+      return {
+        authorization: false,
+        data: null,
+      };
 
     try {
       const checkTokenBlacklist = await this.tokenBlacklistModel.findOne({
         token: token,
       });
 
-      if (checkTokenBlacklist) return false;
+      if (checkTokenBlacklist)
+        return {
+          authorization: false,
+          data: null,
+        };
 
       const data = this.jwtService.verify(token, {
         secret: this.secret,
@@ -41,13 +51,22 @@ export class TokenService {
       });
 
       if (data && data.exp && data.exp * 1000 > Date.now()) {
-        return true;
+        return {
+          authorization: true,
+          data: data,
+        };
       } else {
         await this.tokenBlacklistModel.create({ token: token });
-        return false;
+        return {
+          authorization: false,
+          data: null,
+        };
       }
     } catch (err) {
-      return false;
+      return {
+        authorization: false,
+        data: null,
+      };
     }
   }
 

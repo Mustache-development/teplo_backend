@@ -15,64 +15,78 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminController = void 0;
 const common_1 = require("@nestjs/common");
 const admin_service_1 = require("./admin.service");
-const create_admin_dto_1 = require("./dto/create-admin.dto");
-const update_admin_dto_1 = require("./dto/update-admin.dto");
+const swagger_1 = require("@nestjs/swagger");
+const update_password_dto_1 = require("./dto/update-password.dto");
 let AdminController = class AdminController {
     constructor(adminService) {
         this.adminService = adminService;
     }
-    create(createAdminDto) {
-        return this.adminService.create(createAdminDto);
+    updateEmail(req, args) {
+        return this.adminService.updateEmail(req, args.newEmail);
     }
-    findAll() {
-        return this.adminService.findAll();
+    updatePassword(req, data) {
+        return this.adminService.updatePassword(req, data);
     }
-    findOne(id) {
-        return this.adminService.findOne(+id);
+    updateIdTelegram(req, args) {
+        return this.adminService.updateIdTelegram(req, args.newIdTelegram);
     }
-    update(id, updateAdminDto) {
-        return this.adminService.update(+id, updateAdminDto);
+    updateTokenTelegramBot(req, args) {
+        return this.adminService.updateTokenTelegramBot(req, args.newTokenTelegramBot);
     }
-    remove(id) {
-        return this.adminService.remove(+id);
+    updateTokenMonobank(req, args) {
+        return this.adminService.updateTokenMonobank(req, args.newTokenMonobank);
     }
 };
 exports.AdminController = AdminController;
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, swagger_1.ApiQuery)({ name: "newEmail" }),
+    (0, common_1.Put)("email"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_admin_dto_1.CreateAdminDto]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
-], AdminController.prototype, "create", null);
+], AdminController.prototype, "updateEmail", null);
 __decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], AdminController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(":id"),
-    __param(0, (0, common_1.Param)("id")),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], AdminController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, common_1.Put)("password"),
+    __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_admin_dto_1.UpdateAdminDto]),
+    __metadata("design:paramtypes", [Object, update_password_dto_1.UpdatePasswordDto]),
     __metadata("design:returntype", void 0)
-], AdminController.prototype, "update", null);
+], AdminController.prototype, "updatePassword", null);
 __decorate([
-    (0, common_1.Delete)(":id"),
-    __param(0, (0, common_1.Param)("id")),
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, swagger_1.ApiQuery)({ name: "newIdTelegram" }),
+    (0, common_1.Put)("id-telegram"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
-], AdminController.prototype, "remove", null);
+], AdminController.prototype, "updateIdTelegram", null);
+__decorate([
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, swagger_1.ApiQuery)({ name: "newTokenTelegramBot" }),
+    (0, common_1.Put)("token-telegram-bot"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "updateTokenTelegramBot", null);
+__decorate([
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, swagger_1.ApiQuery)({ name: "newTokenMonobank" }),
+    (0, common_1.Put)("token-monobank"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "updateTokenMonobank", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)("api/admin"),
     __metadata("design:paramtypes", [admin_service_1.AdminService])

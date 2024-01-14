@@ -9,26 +9,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PostsController = void 0;
-const common_1 = require("@nestjs/common");
-const posts_service_1 = require("./posts.service");
-let PostsController = class PostsController {
-    constructor(postsService) {
-        this.postsService = postsService;
-    }
-    getPosts() {
-        return this.postsService.getPosts();
-    }
+exports.PostsSchema = exports.Posts = void 0;
+const mongoose_1 = require("@nestjs/mongoose");
+let Posts = class Posts {
 };
-exports.PostsController = PostsController;
+exports.Posts = Posts;
 __decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], PostsController.prototype, "getPosts", null);
-exports.PostsController = PostsController = __decorate([
-    (0, common_1.Controller)("api/posts"),
-    __metadata("design:paramtypes", [posts_service_1.PostsService])
-], PostsController);
-//# sourceMappingURL=posts.controller.js.map
+    (0, mongoose_1.Prop)({ default: "" }),
+    __metadata("design:type", String)
+], Posts.prototype, "text", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: [] }),
+    __metadata("design:type", Array)
+], Posts.prototype, "photo", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: "" }),
+    __metadata("design:type", String)
+], Posts.prototype, "mediagroup", void 0);
+exports.Posts = Posts = __decorate([
+    (0, mongoose_1.Schema)({
+        timestamps: true,
+    })
+], Posts);
+exports.PostsSchema = mongoose_1.SchemaFactory.createForClass(Posts);
+//# sourceMappingURL=post.schema.js.map

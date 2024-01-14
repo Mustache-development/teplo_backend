@@ -21,27 +21,13 @@
 /// <reference types="mongoose/types/utility" />
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
+/// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
-import mongoose from "mongoose";
-import { IdTelegram } from "src/admin/schemas/id-telegram.schema";
-import { TokenTelegramBot } from "src/admin/schemas/token-telegram-bot.schema";
-import { Posts } from "./schemas/post.schema";
-export declare class PostsService {
-    private idTelegramModel;
-    private tokenTelegramBotModel;
-    private postsModel;
-    private bot;
-    private stage;
-    constructor(idTelegramModel: mongoose.Model<IdTelegram>, tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>, postsModel: mongoose.Model<Posts>);
-    getPosts(): Promise<{
-        code: number;
-        posts: (mongoose.Document<unknown, {}, Posts> & Posts & {
-            _id: mongoose.Types.ObjectId;
-        })[];
-        message?: undefined;
-    } | {
-        code: number;
-        message: string;
-        posts?: undefined;
-    }>;
+export declare class TokenMonobank {
+    token: string;
 }
+export declare const TokenMonobankSchema: import("mongoose").Schema<TokenMonobank, import("mongoose").Model<TokenMonobank, any, any, any, import("mongoose").Document<unknown, any, TokenMonobank> & TokenMonobank & {
+    _id: import("mongoose").Types.ObjectId;
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, TokenMonobank, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<TokenMonobank>> & import("mongoose").FlatRecord<TokenMonobank> & {
+    _id: import("mongoose").Types.ObjectId;
+}>;

@@ -5,6 +5,7 @@ import {
   TokenBlacklistSchema,
 } from "./schemas/token-blacklist.schema";
 import { MongooseModule } from "@nestjs/mongoose";
+import { JwtService } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { MongooseModule } from "@nestjs/mongoose";
       { name: TokenBlacklist.name, schema: TokenBlacklistSchema },
     ]),
   ],
-  providers: [TokenService],
+  providers: [TokenService, JwtService],
   exports: [TokenService],
 })
 export class TokenModule {}

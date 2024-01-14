@@ -109,7 +109,7 @@ export class AuthService {
     try {
       const checkToken = await this.tokenService.validateJwtToken(token);
 
-      if (checkToken) {
+      if (checkToken.authorization) {
         return {
           code: 200,
           message: "authorization success",
@@ -239,6 +239,4 @@ export class AuthService {
       };
     }
   }
-
-  
 }

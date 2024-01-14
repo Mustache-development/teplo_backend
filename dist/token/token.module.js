@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const token_service_1 = require("./token.service");
 const token_blacklist_schema_1 = require("./schemas/token-blacklist.schema");
 const mongoose_1 = require("@nestjs/mongoose");
+const jwt_1 = require("@nestjs/jwt");
 let TokenModule = class TokenModule {
 };
 exports.TokenModule = TokenModule;
@@ -21,7 +22,7 @@ exports.TokenModule = TokenModule = __decorate([
                 { name: token_blacklist_schema_1.TokenBlacklist.name, schema: token_blacklist_schema_1.TokenBlacklistSchema },
             ]),
         ],
-        providers: [token_service_1.TokenService],
+        providers: [token_service_1.TokenService, jwt_1.JwtService],
         exports: [token_service_1.TokenService],
     })
 ], TokenModule);

@@ -1,26 +1,86 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import mongoose from "mongoose";
+import { IdTelegram } from "src/admin/schemas/id-telegram.schema";
+import { TokenTelegramBot } from "src/admin/schemas/token-telegram-bot.schema";
+import { Composer, Context, Telegraf, session } from "telegraf";
+import { message } from "telegraf/filters";
+import { Posts } from "./schemas/post.schema";
 
 @Injectable()
 export class PostsService {
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  private bot: Telegraf;
+  private stage: Composer<Context>;
+  constructor(
+    @InjectModel(IdTelegram.name)
+    private idTelegramModel: mongoose.Model<IdTelegram>,
+    @InjectModel(TokenTelegramBot.name)
+    private tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>,
+    @InjectModel(Posts.name)
+    private postsModel: mongoose.Model<Posts>
+  ) {
+    this.bot = new Telegraf("6731433333:AAExxd3kriL55m90XQcN53gCmdXhtImxHZY");
+
+    this.bot.start((ctx) => ctx.reply("Welcome"));
+
+    this.bot.on("channel_post", async (ctx) => {
+      try {
+        if ((ctx.update.channel_post as any)?.photo) {
+          const photo = (ctx.update.channel_post as any)?.photo;
+
+          if ((ctx.update.channel_post as any)?.media_group_id) {
+            const mediagroup = (ctx.update.channel_post as any)?.media_group_id;
+
+            const checkMediaGroup = await this.postsModel
+              .findOne({
+                mediagroup: mediagroup,
+              })
+              .exec();
+            console.log(checkMediaGroup);
+
+            if (checkMediaGroup) {
+              const check = await ctx.telegram.getFileLink(
+                photo[photo.length - 1].file_id
+              );
+              await this.postsModel.findOneAndUpdate(
+                { _id: checkMediaGroup._id },
+                { photo: [...checkMediaGroup.photo, check.href] }
+              );
+            } else {
+              const check = await ctx.telegram.getFileLink(
+                photo[photo.length - 1].file_id
+              );
+              await this.postsModel.create({
+                photo: [check.href],
+                mediagroup: mediagroup,
+                text: (ctx.update.channel_post as any)?.photo.caption
+                  ? (ctx.update.channel_post as any)?.photo.caption
+                  : "",
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    });
+    this.bot.launch();
   }
 
-  findAll() {
-    return `This action returns all posts`;
-  }
+  async getPosts() {
+    try {
+      const allPosts = await this.postsModel.find();
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
-  }
-
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+      return {
+        code: 200,
+        posts: allPosts,
+      };
+    } catch (err) {
+      console.log(err);
+      return {
+        code: 500,
+        message: "error server",
+      };
+    }
   }
 }

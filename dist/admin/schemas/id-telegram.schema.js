@@ -9,26 +9,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PostsController = void 0;
-const common_1 = require("@nestjs/common");
-const posts_service_1 = require("./posts.service");
-let PostsController = class PostsController {
-    constructor(postsService) {
-        this.postsService = postsService;
-    }
-    getPosts() {
-        return this.postsService.getPosts();
-    }
+exports.IdTelegramSchema = exports.IdTelegram = void 0;
+const mongoose_1 = require("@nestjs/mongoose");
+let IdTelegram = class IdTelegram {
 };
-exports.PostsController = PostsController;
+exports.IdTelegram = IdTelegram;
 __decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], PostsController.prototype, "getPosts", null);
-exports.PostsController = PostsController = __decorate([
-    (0, common_1.Controller)("api/posts"),
-    __metadata("design:paramtypes", [posts_service_1.PostsService])
-], PostsController);
-//# sourceMappingURL=posts.controller.js.map
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], IdTelegram.prototype, "telegram", void 0);
+exports.IdTelegram = IdTelegram = __decorate([
+    (0, mongoose_1.Schema)({
+        timestamps: true,
+    })
+], IdTelegram);
+exports.IdTelegramSchema = mongoose_1.SchemaFactory.createForClass(IdTelegram);
+//# sourceMappingURL=id-telegram.schema.js.map

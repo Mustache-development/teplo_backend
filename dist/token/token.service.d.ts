@@ -22,17 +22,23 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
+import { JwtService } from "@nestjs/jwt";
 import mongoose from "mongoose";
 import { TokenBlacklist } from "./schemas/token-blacklist.schema";
 import { Request } from "express";
 export declare class TokenService {
+    private readonly jwtService;
     private tokenBlacklistModel;
-    private jwtService;
     private secret;
     private timeToken;
-    constructor(tokenBlacklistModel: mongoose.Model<TokenBlacklist>);
+    constructor(jwtService: JwtService, tokenBlacklistModel: mongoose.Model<TokenBlacklist>);
     generateJwtToken(email: string): Promise<string>;
-    validateJwtToken(token: string): Promise<boolean>;
+    validateJwtToken(token: string): Promise<{
+        authorization: boolean;
+        data: {
+            email: string;
+        };
+    }>;
     removeJwtToken(token: string): Promise<void>;
     getBearerToken(request: Request): string;
 }

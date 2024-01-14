@@ -14,12 +14,16 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenService = void 0;
 const common_1 = require("@nestjs/common");
+const jwt_1 = require("@nestjs/jwt");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const token_blacklist_schema_1 = require("./schemas/token-blacklist.schema");
 let TokenService = class TokenService {
-    constructor(tokenBlacklistModel) {
+    constructor(jwtService, tokenBlacklistModel) {
+        this.jwtService = jwtService;
         this.tokenBlacklistModel = tokenBlacklistModel;
+        this.secret = "fsdfsdfsdfsdfd";
+        this.timeToken = 100000;
     }
     async generateJwtToken(email) {
         const payload = { email };
@@ -30,27 +34,42 @@ let TokenService = class TokenService {
     }
     async validateJwtToken(token) {
         if (!token)
-            return false;
+            return {
+                authorization: false,
+                data: null,
+            };
         try {
             const checkTokenBlacklist = await this.tokenBlacklistModel.findOne({
                 token: token,
             });
             if (checkTokenBlacklist)
-                return false;
+                return {
+                    authorization: false,
+                    data: null,
+                };
             const data = this.jwtService.verify(token, {
                 secret: this.secret,
                 ignoreExpiration: false,
             });
             if (data && data.exp && data.exp * 1000 > Date.now()) {
-                return true;
+                return {
+                    authorization: true,
+                    data: data,
+                };
             }
             else {
                 await this.tokenBlacklistModel.create({ token: token });
-                return false;
+                return {
+                    authorization: false,
+                    data: null,
+                };
             }
         }
         catch (err) {
-            return false;
+            return {
+                authorization: false,
+                data: null,
+            };
         }
     }
     async removeJwtToken(token) {
@@ -67,7 +86,7 @@ let TokenService = class TokenService {
 exports.TokenService = TokenService;
 exports.TokenService = TokenService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(token_blacklist_schema_1.TokenBlacklist.name)),
-    __metadata("design:paramtypes", [mongoose_2.default.Model])
+    __param(1, (0, mongoose_1.InjectModel)(token_blacklist_schema_1.TokenBlacklist.name)),
+    __metadata("design:paramtypes", [jwt_1.JwtService, mongoose_2.default.Model])
 ], TokenService);
 //# sourceMappingURL=token.service.js.map

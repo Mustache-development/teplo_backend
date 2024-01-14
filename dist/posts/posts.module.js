@@ -10,11 +10,22 @@ exports.PostsModule = void 0;
 const common_1 = require("@nestjs/common");
 const posts_service_1 = require("./posts.service");
 const posts_controller_1 = require("./posts.controller");
+const mongoose_1 = require("@nestjs/mongoose");
+const id_telegram_schema_1 = require("../admin/schemas/id-telegram.schema");
+const token_telegram_bot_schema_1 = require("../admin/schemas/token-telegram-bot.schema");
+const post_schema_1 = require("./schemas/post.schema");
 let PostsModule = class PostsModule {
 };
 exports.PostsModule = PostsModule;
 exports.PostsModule = PostsModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            mongoose_1.MongooseModule.forFeature([
+                { name: post_schema_1.Posts.name, schema: post_schema_1.PostsSchema },
+                { name: id_telegram_schema_1.IdTelegram.name, schema: id_telegram_schema_1.IdTelegramSchema },
+                { name: token_telegram_bot_schema_1.TokenTelegramBot.name, schema: token_telegram_bot_schema_1.TokenTelegramBotSchema },
+            ]),
+        ],
         controllers: [posts_controller_1.PostsController],
         providers: [posts_service_1.PostsService],
     })

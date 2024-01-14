@@ -9,26 +9,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PostsController = void 0;
-const common_1 = require("@nestjs/common");
-const posts_service_1 = require("./posts.service");
-let PostsController = class PostsController {
-    constructor(postsService) {
-        this.postsService = postsService;
-    }
-    getPosts() {
-        return this.postsService.getPosts();
-    }
-};
-exports.PostsController = PostsController;
+exports.UpdatePasswordDto = void 0;
+const swagger_1 = require("@nestjs/swagger");
+class UpdatePasswordDto {
+}
+exports.UpdatePasswordDto = UpdatePasswordDto;
 __decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], PostsController.prototype, "getPosts", null);
-exports.PostsController = PostsController = __decorate([
-    (0, common_1.Controller)("api/posts"),
-    __metadata("design:paramtypes", [posts_service_1.PostsService])
-], PostsController);
-//# sourceMappingURL=posts.controller.js.map
+    (0, swagger_1.ApiProperty)({ required: true }),
+    __metadata("design:type", String)
+], UpdatePasswordDto.prototype, "currentPassword", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ required: true }),
+    __metadata("design:type", String)
+], UpdatePasswordDto.prototype, "newPassword", void 0);
+//# sourceMappingURL=update-password.dto.js.map
