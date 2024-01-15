@@ -34,6 +34,7 @@ export declare class PostsService {
     private stage;
     private isProcessing;
     constructor(idTelegramModel: mongoose.Model<IdTelegram>, tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>, postsModel: mongoose.Model<Posts>);
+    initialize(): Promise<void>;
     getPosts(): Promise<{
         code: number;
         posts: (mongoose.Document<unknown, {}, Posts> & Posts & {

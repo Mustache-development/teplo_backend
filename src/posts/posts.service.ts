@@ -22,7 +22,15 @@ export class PostsService {
     @InjectModel(Posts.name)
     private postsModel: mongoose.Model<Posts>
   ) {
-    this.bot = new Telegraf("6731433333:AAExxd3kriL55m90XQcN53gCmdXhtImxHZY");
+    this.initialize();
+  }
+
+  async initialize() {
+    const token = await this.tokenTelegramBotModel.find();
+
+    if (!token.length) return;
+
+    this.bot = new Telegraf(token[0].token);
 
     this.bot.start((ctx) => ctx.reply("Welcome"));
 

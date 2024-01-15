@@ -28,7 +28,13 @@ let PostsService = class PostsService {
         this.tokenTelegramBotModel = tokenTelegramBotModel;
         this.postsModel = postsModel;
         this.isProcessing = false;
-        this.bot = new telegraf_1.Telegraf("6731433333:AAExxd3kriL55m90XQcN53gCmdXhtImxHZY");
+        this.initialize();
+    }
+    async initialize() {
+        const token = await this.tokenTelegramBotModel.find();
+        if (!token.length)
+            return;
+        this.bot = new telegraf_1.Telegraf(token[0].token);
         this.bot.start((ctx) => ctx.reply("Welcome"));
         this.bot.on("channel_post", async (ctx) => {
             try {
