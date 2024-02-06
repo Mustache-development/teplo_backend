@@ -16,6 +16,7 @@ const admin_module_1 = require("./admin/admin.module");
 const posts_module_1 = require("./posts/posts.module");
 const bank_module_1 = require("./bank/bank.module");
 const token_module_1 = require("./token/token.module");
+const bank_whook_module_1 = require("./bank-whook/bank-whook.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
             posts_module_1.PostsModule,
             bank_module_1.BankModule,
             token_module_1.TokenModule,
+            bank_whook_module_1.BankWebHookModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

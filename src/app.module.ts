@@ -7,6 +7,7 @@ import { AdminModule } from "./admin/admin.module";
 import { PostsModule } from "./posts/posts.module";
 import { BankModule } from "./bank/bank.module";
 import { TokenModule } from "./token/token.module";
+import { BankWebHookModule } from "./bank-whook/bank-whook.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TokenModule } from "./token/token.module";
     PostsModule,
     BankModule,
     TokenModule,
+    BankWebHookModule,
   ],
   controllers: [AppController],
   providers: [AppService],

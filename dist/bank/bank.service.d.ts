@@ -1,9 +1,11 @@
-import { CreateBankDto } from './dto/create-bank.dto';
-import { UpdateBankDto } from './dto/update-bank.dto';
+import { HttpService } from "@nestjs/axios";
 export declare class BankService {
-    create(createBankDto: CreateBankDto): string;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: number, updateBankDto: UpdateBankDto): string;
-    remove(id: number): string;
+    private readonly httpService;
+    constructor(httpService: HttpService);
+    statementURL: string;
+    webHookPostUrl: string;
+    webHookUrl: string;
+    token: string;
+    BANK_ACCOUNT: string;
+    getStatement(): Promise<any>;
 }

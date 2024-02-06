@@ -206,10 +206,10 @@ let AdminService = class AdminService {
             }
             const checkTokenMonobank = await this.tokenMonobankModel.find();
             if (checkTokenMonobank.length > 0) {
-                await this.tokenTelegramBotModel.findOneAndUpdate({ _id: checkTokenMonobank[0]._id }, { token: newTokenMonobank });
+                await this.tokenMonobankModel.findOneAndUpdate({ _id: checkTokenMonobank[0]._id }, { token: newTokenMonobank });
             }
             else {
-                await this.tokenTelegramBotModel.create({ token: newTokenMonobank });
+                await this.tokenMonobankModel.create({ token: newTokenMonobank });
             }
             return {
                 code: 200,
