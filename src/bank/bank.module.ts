@@ -4,6 +4,7 @@ import { BankController } from "./bank.controller";
 import { HttpModule } from "@nestjs/axios";
 import { MongooseModule } from "@nestjs/mongoose";
 import { BankSchema } from "./schemas/bank.schemas";
+//import { BankGateway } from "src/bank-whook/bank.gateway";
 
 @Module({
   imports: [
@@ -11,6 +12,9 @@ import { BankSchema } from "./schemas/bank.schemas";
     MongooseModule.forFeature([{ name: "Bank", schema: BankSchema }]),
   ],
   controllers: [BankController],
-  providers: [BankService],
+  providers: [
+    BankService,
+    //BankGateway
+  ],
 })
 export class BankModule {}

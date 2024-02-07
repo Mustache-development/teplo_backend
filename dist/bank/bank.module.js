@@ -23,7 +23,9 @@ exports.BankModule = BankModule = __decorate([
             mongoose_1.MongooseModule.forFeature([{ name: "Bank", schema: bank_schemas_1.BankSchema }]),
         ],
         controllers: [bank_controller_1.BankController],
-        providers: [bank_service_1.BankService],
+        providers: [
+            bank_service_1.BankService,
+        ],
     })
 ], BankModule);
 //# sourceMappingURL=bank.module.js.map

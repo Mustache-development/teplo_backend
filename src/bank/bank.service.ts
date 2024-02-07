@@ -4,8 +4,9 @@ import { Injectable } from "@nestjs/common";
 //import { InjectModel } from "@nestjs/mongoose";
 import { catchError, firstValueFrom, lastValueFrom } from "rxjs";
 import { HttpService } from "@nestjs/axios";
-import { Bank } from "./schemas/bank.schemas";
+//import { Bank } from "./schemas/bank.schemas";
 //import { AxiosResponse } from "axios";
+//import { BankGateway } from "src/bank-whook/bank.gateway";
 import { config } from "dotenv";
 config();
 
@@ -13,59 +14,41 @@ config();
 export class BankService {
   constructor(
     private readonly httpService: HttpService
+    //private readonly BankGateway: BankGateway
     //@InjectModel("Bank")
     //private bankModel: mongoose.Model<Bank>
   ) {}
 
   statementURL = "https://api.monobank.ua/personal/statement";
   webHookPostUrl = "https://api.monobank.ua/personal/webhook";
-  webHookUrl = process.env.BASE_WEB_HOOK_URL + "/api/bankWebHook";
-
+  webHookUrl = process.env.SERVER_URL + "/api/bankWebHook";
   token = process.env.X_TOKEN;
   BANK_ACCOUNT = !process.env.BANK_ACCOUNT ? "/0" : process.env.BANK_ACCOUNT;
-
-  //create(createBankDto: CreateBankDto) {
-  //  return "This action adds a new bank";
-  //}
 
   async getStatement(): Promise<any> {
     const currentDate = new Date();
     const to = Math.floor(currentDate.getTime() / 1000);
     const from = to - 2682000;
 
-    //
     const webHookData = {
       webHookUrl: this.webHookUrl,
     };
 
     try {
       await firstValueFrom(
-        this.httpService.post(this.webHookUrl, JSON.stringify(webHookData), {
-          headers: {
-            "X-Token": this.token,
-          },
-        })
+        this.httpService.post(
+          this.webHookPostUrl,
+          JSON.stringify(webHookData),
+          {
+            headers: {
+              "X-Token": this.token,
+            },
+          }
+        )
       );
     } catch (error) {
       console.log(error);
     }
-
-    //
-    //console.log(
-    //  await lastValueFrom(
-    //    this.httpService
-    //      .get<any>("https://api.monobank.ua/personal/client-info", {
-    //        headers: { "X-Token": this.token },
-    //      })
-    //      .pipe(
-    //        catchError((error) => {
-    //          console.error(error.response.data);
-    //          throw "An error happened!";
-    //        })
-    //      )
-    //  )
-    //);
-    //
 
     const { data } = await lastValueFrom(
       this.httpService
@@ -97,8 +80,7 @@ export class BankService {
       transactions: transactions,
     };
 
-    //на Моно направить адрес для WH
-    //запустить WS и передать данные
+    //this.BankGateway.handlePost(statement);
 
     return statement;
   }

@@ -32,7 +32,7 @@ let BankService = class BankService {
             webHookUrl: this.webHookUrl,
         };
         try {
-            await (0, rxjs_1.firstValueFrom)(this.httpService.post(this.webHookUrl, JSON.stringify(webHookData), {
+            await (0, rxjs_1.firstValueFrom)(this.httpService.post(this.webHookPostUrl, JSON.stringify(webHookData), {
                 headers: {
                     "X-Token": this.token,
                 },
