@@ -103,9 +103,10 @@ export class AdminService {
       }
 
       if (bcrypt.compareSync(data.currentPassword, checkAdmin.password)) {
+        
         await this.authModel.findOneAndUpdate(
           { _id: checkAdmin._id },
-          { password: data.newPassword }
+          { password: bcrypt.hashSync(data.newPassword) }
         );
         return {
           code: 200,

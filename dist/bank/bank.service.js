@@ -20,7 +20,7 @@ let BankService = class BankService {
         this.httpService = httpService;
         this.statementURL = "https://api.monobank.ua/personal/statement";
         this.webHookPostUrl = "https://api.monobank.ua/personal/webhook";
-        this.webHookUrl = process.env.BASE_WEB_HOOK_URL + "/api/bankWebHook";
+        this.webHookUrl = process.env.SERVER_URL + "/api/bankWebHook";
         this.token = process.env.X_TOKEN;
         this.BANK_ACCOUNT = !process.env.BANK_ACCOUNT ? "/0" : process.env.BANK_ACCOUNT;
     }

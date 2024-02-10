@@ -3,8 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { IdTelegram } from "src/admin/schemas/id-telegram.schema";
 import { TokenTelegramBot } from "src/admin/schemas/token-telegram-bot.schema";
-import { Composer, Context, Telegraf, session } from "telegraf";
-import { message } from "telegraf/filters";
+import { Composer, Context, Telegraf } from "telegraf";
 import { Posts } from "./schemas/post.schema";
 import * as fs from "fs";
 import axios from "axios";
@@ -26,66 +25,98 @@ export class PostsService {
   }
 
   async initialize() {
-    const token = await this.tokenTelegramBotModel.find();
+    try {
+      const token = await this.tokenTelegramBotModel.find();
 
-    if (!token.length) return;
+      if (!token.length) return;
 
-    this.bot = new Telegraf(token[0].token);
+      this.bot = new Telegraf(token[0].token);
 
-    this.bot.start((ctx) => ctx.reply("Welcome"));
+      this.bot.start((ctx) => ctx.reply("Welcome"));
 
-    this.bot.on("channel_post", async (ctx) => {
-      try {
-        if (this.isProcessing) {
-          while (this.isProcessing) {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+      this.bot.on("channel_post", async (ctx) => {
+        try {
+          if (this.isProcessing) {
+            while (this.isProcessing) {
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
           }
-        }
 
-        this.isProcessing = true;
-        if ((ctx.update.channel_post as any)?.photo) {
-          const photo = (ctx.update.channel_post as any)?.photo;
+          this.isProcessing = true;
+          if ((ctx.update.channel_post as any)?.photo) {
+            const photo = (ctx.update.channel_post as any)?.photo;
 
-          if ((ctx.update.channel_post as any)?.media_group_id) {
-            const mediagroup = (ctx.update.channel_post as any)?.media_group_id;
+            if ((ctx.update.channel_post as any)?.media_group_id) {
+              const mediagroup = (ctx.update.channel_post as any)
+                ?.media_group_id;
 
-            const checkMediaGroup = await this.postsModel
-              .findOne({
-                mediagroup: mediagroup,
-              })
-              .exec();
-
-            if (checkMediaGroup) {
-              const check = await ctx.telegram.getFileLink(
-                photo[photo.length - 1].file_id
-              );
-
-              const response = await axios.get(check.href, {
-                responseType: "arraybuffer",
-              });
-
-              if (!fs.existsSync("upload")) {
-                fs.mkdirSync("upload");
-              }
-
-              fs.writeFileSync(
-                `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
-                response.data
-              );
-
-              await this.postsModel
-                .findOneAndUpdate(
-                  { _id: checkMediaGroup._id },
-                  {
-                    photo: [
-                      ...checkMediaGroup.photo,
-                      `${process.env.SERVER_URL}/upload/${
-                        photo[photo.length - 1].file_unique_id
-                      }.jpg`,
-                    ],
-                  }
-                )
+              const checkMediaGroup = await this.postsModel
+                .findOne({
+                  mediagroup: mediagroup,
+                })
                 .exec();
+
+              if (checkMediaGroup) {
+                const check = await ctx.telegram.getFileLink(
+                  photo[photo.length - 1].file_id
+                );
+
+                const response = await axios.get(check.href, {
+                  responseType: "arraybuffer",
+                });
+
+                if (!fs.existsSync("upload")) {
+                  fs.mkdirSync("upload");
+                }
+
+                fs.writeFileSync(
+                  `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+                  response.data
+                );
+
+                await this.postsModel
+                  .findOneAndUpdate(
+                    { _id: checkMediaGroup._id },
+                    {
+                      photo: [
+                        ...checkMediaGroup.photo,
+                        `${process.env.SERVER_URL}/upload/${
+                          photo[photo.length - 1].file_unique_id
+                        }.jpg`,
+                      ],
+                    }
+                  )
+                  .exec();
+              } else {
+                const check = await ctx.telegram.getFileLink(
+                  photo[photo.length - 1].file_id
+                );
+
+                const response = await axios.get(check.href, {
+                  responseType: "arraybuffer",
+                });
+
+                if (!fs.existsSync("upload")) {
+                  fs.mkdirSync("upload");
+                }
+
+                fs.writeFileSync(
+                  `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+                  response.data
+                );
+
+                await this.postsModel.create({
+                  photo: [
+                    `${process.env.SERVER_URL}/upload/${
+                      photo[photo.length - 1].file_unique_id
+                    }.jpg`,
+                  ],
+                  mediagroup: mediagroup,
+                  text: (ctx.update.channel_post as any)?.caption
+                    ? (ctx.update.channel_post as any)?.caption
+                    : "",
+                });
+              }
             } else {
               const check = await ctx.telegram.getFileLink(
                 photo[photo.length - 1].file_id
@@ -110,53 +141,26 @@ export class PostsService {
                     photo[photo.length - 1].file_unique_id
                   }.jpg`,
                 ],
-                mediagroup: mediagroup,
                 text: (ctx.update.channel_post as any)?.caption
                   ? (ctx.update.channel_post as any)?.caption
                   : "",
               });
             }
           } else {
-            const check = await ctx.telegram.getFileLink(
-              photo[photo.length - 1].file_id
-            );
-
-            const response = await axios.get(check.href, {
-              responseType: "arraybuffer",
-            });
-
-            if (!fs.existsSync("upload")) {
-              fs.mkdirSync("upload");
-            }
-
-            fs.writeFileSync(
-              `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
-              response.data
-            );
-
             await this.postsModel.create({
-              photo: [
-                `${process.env.SERVER_URL}/upload/${
-                  photo[photo.length - 1].file_unique_id
-                }.jpg`,
-              ],
-              text: (ctx.update.channel_post as any)?.caption
-                ? (ctx.update.channel_post as any)?.caption
-                : "",
+              text: (ctx.update.channel_post as any).text,
             });
           }
-        } else {
-          await this.postsModel.create({
-            text: (ctx.update.channel_post as any).text,
-          });
+        } catch (err) {
+          console.log(err);
+        } finally {
+          this.isProcessing = false;
         }
-      } catch (err) {
-        console.log(err);
-      } finally {
-        this.isProcessing = false;
-      }
-    });
-    this.bot.launch();
+      });
+      this.bot.launch();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getPosts() {
