@@ -14,7 +14,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ["*", "http://localhost:3000", "https://clinquant-peony-77005c.netlify.app/"],
+    origin: ["*", "http://localhost:3000", "https://subtle-rabanadas-560bb7.netlify.app/"],
     methods: "GET,PUT,POST,DELETE",
     allowedHeaders: "Content-Type, Authorization",
   });
