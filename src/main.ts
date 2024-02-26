@@ -14,7 +14,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ["*", "http://localhost:3000", "https://subtle-rabanadas-560bb7.netlify.app/"],
+    origin: ["*", "http://localhost:3000", "https://teplo-na-peredovu.netlify.app/"],
     methods: "GET,PUT,POST,DELETE",
     allowedHeaders: "Content-Type, Authorization",
   });
