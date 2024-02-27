@@ -1,31 +1,43 @@
 import { Injectable } from "@nestjs/common";
-//import { CreateBankDto } from "./dto/create-bank.dto";
-//import mongoose from "mongoose";
-//import { InjectModel } from "@nestjs/mongoose";
-import { catchError, firstValueFrom, lastValueFrom } from "rxjs";
+import mongoose from "mongoose";
+import { InjectModel } from "@nestjs/mongoose";
+import { TokenMonobank } from "src/admin/schemas/token-monobank.schema";
+import { catchError, lastValueFrom } from "rxjs";
 import { HttpService } from "@nestjs/axios";
-//import { Bank } from "./schemas/bank.schemas";
-//import { AxiosResponse } from "axios";
-//import { BankGateway } from "src/bank-whook/bank.gateway";
 import { config } from "dotenv";
 config();
 
 @Injectable()
 export class BankService {
   constructor(
-    private readonly httpService: HttpService
-    //private readonly BankGateway: BankGateway
-    //@InjectModel("Bank")
-    //private bankModel: mongoose.Model<Bank>
+    private readonly httpService: HttpService,
+    @InjectModel(TokenMonobank.name)
+    private tokenMonobankModel: mongoose.Model<TokenMonobank>
   ) {}
 
-  statementURL = "https://api.monobank.ua/personal/statement";
+  statementURL = "https://api.monobank.ua/personal/statement/";
   webHookPostUrl = "https://api.monobank.ua/personal/webhook";
   webHookUrl = process.env.SERVER_URL + "/api/bankWebHook";
-  token = process.env.X_TOKEN;
-  BANK_ACCOUNT = !process.env.BANK_ACCOUNT ? "/0" : process.env.BANK_ACCOUNT;
 
   async getStatement(): Promise<any> {
+    const checkMonobank = await this.tokenMonobankModel.find();
+    if (checkMonobank.length === 0) {
+      return {
+        code: 400,
+        message: "Check Monobank token, please.",
+      };
+    }
+
+    const monoToken = checkMonobank[0].token;
+    if (!monoToken) {
+      return {
+        code: 400,
+        message: "Check Monobank token, please.",
+      };
+    }
+
+    const jar = !checkMonobank[0].activeJar ? "0" : checkMonobank[0].activeJar;
+
     const currentDate = new Date();
     const to = Math.floor(currentDate.getTime() / 1000);
     const from = to - 2682000;
@@ -35,13 +47,13 @@ export class BankService {
     };
 
     try {
-      await firstValueFrom(
+      await lastValueFrom(
         this.httpService.post(
           this.webHookPostUrl,
           JSON.stringify(webHookData),
           {
             headers: {
-              "X-Token": this.token,
+              "X-Token": monoToken,
             },
           }
         )
@@ -52,12 +64,9 @@ export class BankService {
 
     const { data } = await lastValueFrom(
       this.httpService
-        .get<any>(
-          this.statementURL + this.BANK_ACCOUNT + "/" + from + "/" + to,
-          {
-            headers: { "X-Token": this.token },
-          }
-        )
+        .get<any>(this.statementURL + jar + "/" + from + "/" + to, {
+          headers: { "X-Token": monoToken },
+        })
         .pipe(
           catchError((error) => {
             console.error(error.response.data);
@@ -66,7 +75,7 @@ export class BankService {
         )
     );
 
-    const transactions = data.map(function (transaction) {
+    const transactions = data.map(function (transaction: any) {
       return {
         trans_id: transaction.id,
         trans_type: transaction.amount > 0 ? "Зарахування" : "Списання",
@@ -79,8 +88,6 @@ export class BankService {
       balance: (data[0].balance / 100).toFixed(2),
       transactions: transactions,
     };
-
-    //this.BankGateway.handlePost(statement);
 
     return statement;
   }

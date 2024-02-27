@@ -13,6 +13,8 @@ const bank_controller_1 = require("./bank.controller");
 const axios_1 = require("@nestjs/axios");
 const mongoose_1 = require("@nestjs/mongoose");
 const bank_schemas_1 = require("./schemas/bank.schemas");
+const bank_gateway_1 = require("../bank-whook/bank.gateway");
+const token_monobank_schema_1 = require("../admin/schemas/token-monobank.schema");
 let BankModule = class BankModule {
 };
 exports.BankModule = BankModule;
@@ -20,12 +22,13 @@ exports.BankModule = BankModule = __decorate([
     (0, common_1.Module)({
         imports: [
             axios_1.HttpModule,
-            mongoose_1.MongooseModule.forFeature([{ name: "Bank", schema: bank_schemas_1.BankSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: "Bank", schema: bank_schemas_1.BankSchema },
+                { name: "TokenMonobank", schema: token_monobank_schema_1.TokenMonobankSchema },
+            ]),
         ],
         controllers: [bank_controller_1.BankController],
-        providers: [
-            bank_service_1.BankService,
-        ],
+        providers: [bank_service_1.BankService, bank_gateway_1.BankGateway],
     })
 ], BankModule);
 //# sourceMappingURL=bank.module.js.map

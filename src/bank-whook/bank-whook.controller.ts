@@ -1,12 +1,37 @@
 import { Controller, Post, Body, Get } from "@nestjs/common";
+import mongoose from "mongoose";
+import { InjectModel } from "@nestjs/mongoose";
+import { TokenMonobank } from "../admin/schemas/token-monobank.schema";
 import { BankGateway } from "./bank.gateway";
 
 @Controller("api/bankWebHook")
 export class BankWebHookController {
-  constructor(private readonly BankGateway: BankGateway) {}
+  constructor(
+    @InjectModel(TokenMonobank.name)
+    private tokenMonobankModel: mongoose.Model<TokenMonobank>,
+    private readonly BankGateway: BankGateway
+  ) {}
 
   @Post()
   async createPost(@Body() webHook: any) {
+    const checkMonobank = await this.tokenMonobankModel.find();
+    if (checkMonobank.length === 0) {
+      return {
+        code: 400,
+        message: "Invalid token",
+      };
+    }
+
+    const monoToken = checkMonobank[0].token;
+    if (!monoToken) {
+      return {
+        code: 400,
+        message: "Invalid token",
+      };
+    }
+
+    const jar = !checkMonobank[0].activeJar ? "0" : checkMonobank[0].activeJar;
+
     const StatementItem = {
       balance: webHook.data.statementItem.balance.toFixed(2),
       transaction: {
@@ -18,7 +43,10 @@ export class BankWebHookController {
       },
     };
 
-    this.BankGateway.handlePost(StatementItem);
+    if (jar === webHook.data.account) {
+      this.BankGateway.handlePost(StatementItem);
+    }
+
     return { msg: "Post created" };
   }
 

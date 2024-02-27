@@ -25,6 +25,11 @@
 /// <reference types="mongoose/types/inferschematype" />
 export declare class TokenMonobank {
     token: string;
+    activeJar: {
+        type: string;
+        default: "0";
+    };
+    jars: string[];
 }
 export declare const TokenMonobankSchema: import("mongoose").Schema<TokenMonobank, import("mongoose").Model<TokenMonobank, any, any, any, import("mongoose").Document<unknown, any, TokenMonobank> & TokenMonobank & {
     _id: import("mongoose").Types.ObjectId;

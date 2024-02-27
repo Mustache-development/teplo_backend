@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminModule = void 0;
 const common_1 = require("@nestjs/common");
+const axios_1 = require("@nestjs/axios");
 const admin_service_1 = require("./admin.service");
 const admin_controller_1 = require("./admin.controller");
 const token_module_1 = require("../token/token.module");
@@ -22,6 +23,7 @@ exports.AdminModule = AdminModule;
 exports.AdminModule = AdminModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            axios_1.HttpModule,
             token_module_1.TokenModule,
             mongoose_1.MongooseModule.forFeature([
                 { name: auth_schema_1.Auth.name, schema: auth_schema_1.AuthSchema },

@@ -33,8 +33,11 @@ let AdminController = class AdminController {
     updateTokenTelegramBot(req, args) {
         return this.adminService.updateTokenTelegramBot(req, args.newTokenTelegramBot);
     }
-    updateTokenMonobank(req, args) {
-        return this.adminService.updateTokenMonobank(req, args.newTokenMonobank);
+    updateTokenMonobank(req, data) {
+        return this.adminService.updateTokenMonobank(req, data.token);
+    }
+    updateJarMonobank(req, data) {
+        return this.adminService.updateActiveJar(req, data.jar);
     }
 };
 exports.AdminController = AdminController;
@@ -82,11 +85,21 @@ __decorate([
     (0, swagger_1.ApiQuery)({ name: "newTokenMonobank" }),
     (0, common_1.Put)("token-monobank"),
     __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Query)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "updateTokenMonobank", null);
+__decorate([
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, swagger_1.ApiQuery)({ name: "newTokenMonobank" }),
+    (0, common_1.Put)("jar-monobank"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "updateJarMonobank", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)("api/admin"),
     __metadata("design:paramtypes", [admin_service_1.AdminService])

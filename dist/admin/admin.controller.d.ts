@@ -46,8 +46,26 @@ export declare class AdminController {
         message: string;
         status?: undefined;
     }>;
-    updateTokenMonobank(req: Request, args: {
-        newTokenMonobank: string;
+    updateTokenMonobank(req: Request, data: {
+        token: string;
+    }): Promise<{
+        status: number;
+        message: string;
+        code?: undefined;
+        jars?: undefined;
+    } | {
+        code: number;
+        message: string;
+        status?: undefined;
+        jars?: undefined;
+    } | {
+        code: number;
+        message: string;
+        jars: any[];
+        status?: undefined;
+    }>;
+    updateJarMonobank(req: Request, data: {
+        jar: string;
     }): Promise<{
         status: number;
         message: string;

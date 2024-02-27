@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { HttpModule } from "@nestjs/axios";
 import { AdminService } from "./admin.service";
 import { AdminController } from "./admin.controller";
 import { TokenModule } from "src/token/token.module";
@@ -17,6 +18,7 @@ import {
 
 @Module({
   imports: [
+    HttpModule,
     TokenModule,
     MongooseModule.forFeature([
       { name: Auth.name, schema: AuthSchema },

@@ -48,7 +48,8 @@ let PostsService = class PostsService {
                     if (ctx.update.channel_post?.photo) {
                         const photo = ctx.update.channel_post?.photo;
                         if (ctx.update.channel_post?.media_group_id) {
-                            const mediagroup = ctx.update.channel_post?.media_group_id;
+                            const mediagroup = ctx.update.channel_post
+                                ?.media_group_id;
                             const checkMediaGroup = await this.postsModel
                                 .findOne({
                                 mediagroup: mediagroup,

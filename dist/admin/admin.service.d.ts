@@ -30,13 +30,15 @@ import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { IdTelegram } from "./schemas/id-telegram.schema";
 import { TokenMonobank } from "./schemas/token-monobank.schema";
 import { TokenTelegramBot } from "./schemas/token-telegram-bot.schema";
+import { HttpService } from "@nestjs/axios";
 export declare class AdminService {
     private readonly tokenService;
     private authModel;
     private idTelegramModel;
     private tokenTelegramBotModel;
     private tokenMonobankModel;
-    constructor(tokenService: TokenService, authModel: mongoose.Model<Auth>, idTelegramModel: mongoose.Model<IdTelegram>, tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>, tokenMonobankModel: mongoose.Model<TokenMonobank>);
+    private readonly httpService;
+    constructor(tokenService: TokenService, authModel: mongoose.Model<Auth>, idTelegramModel: mongoose.Model<IdTelegram>, tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>, tokenMonobankModel: mongoose.Model<TokenMonobank>, httpService: HttpService);
     updateEmail(req: Request, newEmail: string): Promise<{
         status: number;
         message: string;
@@ -73,7 +75,23 @@ export declare class AdminService {
         message: string;
         status?: undefined;
     }>;
-    updateTokenMonobank(req: Request, newTokenMonobank: string): Promise<{
+    updateTokenMonobank(req: any, newTokenMonobank: string): Promise<{
+        status: number;
+        message: string;
+        code?: undefined;
+        jars?: undefined;
+    } | {
+        code: number;
+        message: string;
+        status?: undefined;
+        jars?: undefined;
+    } | {
+        code: number;
+        message: string;
+        jars: any[];
+        status?: undefined;
+    }>;
+    updateActiveJar(req: any, newActiveJar: string): Promise<{
         status: number;
         message: string;
         code?: undefined;

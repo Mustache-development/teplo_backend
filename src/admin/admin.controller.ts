@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Put,
-  Query,
-  Req,
-} from "@nestjs/common";
+import { Controller, Body, Put, Query, Req } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { ApiHeaders, ApiQuery } from "@nestjs/swagger";
 import { Request } from "express";
@@ -58,10 +47,14 @@ export class AdminController {
   @ApiHeaders([{ name: "Authorization" }])
   @ApiQuery({ name: "newTokenMonobank" })
   @Put("token-monobank")
-  updateTokenMonobank(
-    @Req() req: Request,
-    @Query() args: { newTokenMonobank: string }
-  ) {
-    return this.adminService.updateTokenMonobank(req, args.newTokenMonobank);
+  updateTokenMonobank(@Req() req: Request, @Body() data: { token: string }) {
+    return this.adminService.updateTokenMonobank(req, data.token);
+  }
+
+  @ApiHeaders([{ name: "Authorization" }])
+  @ApiQuery({ name: "newTokenMonobank" })
+  @Put("jar-monobank")
+  updateJarMonobank(@Req() req: Request, @Body() data: { jar: string }) {
+    return this.adminService.updateActiveJar(req, data.jar);
   }
 }

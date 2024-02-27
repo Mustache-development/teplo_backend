@@ -12,7 +12,7 @@ async function bootstrap() {
         prefix: "/upload",
     });
     app.enableCors({
-        origin: ["*", "http://localhost:3000", "https://clinquant-peony-77005c.netlify.app/"],
+        origin: ["*", "http://localhost:3000", "https://teplo-na-peredovu.netlify.app/", "https://teplo-jade.vercel.app/"],
         methods: "GET,PUT,POST,DELETE",
         allowedHeaders: "Content-Type, Authorization",
     });

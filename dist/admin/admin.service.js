@@ -22,13 +22,16 @@ const id_telegram_schema_1 = require("./schemas/id-telegram.schema");
 const token_monobank_schema_1 = require("./schemas/token-monobank.schema");
 const token_telegram_bot_schema_1 = require("./schemas/token-telegram-bot.schema");
 const bcrypt = require("bcryptjs");
+const axios_1 = require("@nestjs/axios");
+const rxjs_1 = require("rxjs");
 let AdminService = class AdminService {
-    constructor(tokenService, authModel, idTelegramModel, tokenTelegramBotModel, tokenMonobankModel) {
+    constructor(tokenService, authModel, idTelegramModel, tokenTelegramBotModel, tokenMonobankModel, httpService) {
         this.tokenService = tokenService;
         this.authModel = authModel;
         this.idTelegramModel = idTelegramModel;
         this.tokenTelegramBotModel = tokenTelegramBotModel;
         this.tokenMonobankModel = tokenMonobankModel;
+        this.httpService = httpService;
     }
     async updateEmail(req, newEmail) {
         const token = this.tokenService.getBearerToken(req);
@@ -95,7 +98,7 @@ let AdminService = class AdminService {
                 };
             }
             if (bcrypt.compareSync(data.currentPassword, checkAdmin.password)) {
-                await this.authModel.findOneAndUpdate({ _id: checkAdmin._id }, { password: data.newPassword });
+                await this.authModel.findOneAndUpdate({ _id: checkAdmin._id }, { password: bcrypt.hashSync(data.newPassword) });
                 return {
                     code: 200,
                     message: "password update",
@@ -204,16 +207,71 @@ let AdminService = class AdminService {
                     message: "authorization fail",
                 };
             }
-            const checkTokenMonobank = await this.tokenMonobankModel.find();
-            if (checkTokenMonobank.length > 0) {
-                await this.tokenMonobankModel.findOneAndUpdate({ _id: checkTokenMonobank[0]._id }, { token: newTokenMonobank });
+            const { data } = await (0, rxjs_1.lastValueFrom)(this.httpService
+                .get("https://api.monobank.ua/personal/statement/", {
+                headers: { "X-Token": token },
+            })
+                .pipe((0, rxjs_1.catchError)((error) => {
+                throw error;
+            })));
+            let jars = [];
+            if (data.jars) {
+                jars = data.jars.map(function (jar) {
+                    return {
+                        id: jar.id,
+                        title: jar.title,
+                    };
+                });
+            }
+            const checkMonobank = await this.tokenMonobankModel.find();
+            if (checkMonobank.length > 0) {
+                await this.tokenMonobankModel.findOneAndUpdate({ _id: checkMonobank[0]._id }, { token: newTokenMonobank, jars: jars });
             }
             else {
-                await this.tokenMonobankModel.create({ token: newTokenMonobank });
+                await this.tokenMonobankModel.create({
+                    token: newTokenMonobank,
+                    jars: jars,
+                });
             }
             return {
                 code: 200,
-                message: "token monobank update",
+                message: "Token monobank update. Check jar, please.",
+                jars,
+            };
+        }
+        catch (err) {
+            console.log(err);
+            return {
+                code: 500,
+                message: "error server",
+            };
+        }
+    }
+    async updateActiveJar(req, newActiveJar) {
+        const token = this.tokenService.getBearerToken(req);
+        if (!newActiveJar || !token) {
+            return {
+                status: 400,
+                message: "Not enough arguments",
+            };
+        }
+        try {
+            const tokenData = await this.tokenService.validateJwtToken(token);
+            if (!tokenData.authorization) {
+                return {
+                    code: 401,
+                    message: "authorization fail",
+                };
+            }
+            const checkMonobank = await this.tokenMonobankModel.find();
+            if (checkMonobank.length === 0 &&
+                !checkMonobank[0].jars.includes(newActiveJar)) {
+                throw "Invalid Monobank token or jar";
+            }
+            await this.tokenMonobankModel.findOneAndUpdate({ _id: checkMonobank[0]._id }, { activeJar: newActiveJar });
+            return {
+                code: 200,
+                message: "Active jar monobank update",
             };
         }
         catch (err) {
@@ -232,6 +290,6 @@ exports.AdminService = AdminService = __decorate([
     __param(2, (0, mongoose_2.InjectModel)(id_telegram_schema_1.IdTelegram.name)),
     __param(3, (0, mongoose_2.InjectModel)(token_telegram_bot_schema_1.TokenTelegramBot.name)),
     __param(4, (0, mongoose_2.InjectModel)(token_monobank_schema_1.TokenMonobank.name)),
-    __metadata("design:paramtypes", [token_service_1.TokenService, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model])
+    __metadata("design:paramtypes", [token_service_1.TokenService, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model, axios_1.HttpService])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map
