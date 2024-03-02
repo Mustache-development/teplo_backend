@@ -237,7 +237,7 @@ export class AdminService {
       const { data } = await lastValueFrom(
         this.httpService
           .get<any>("https://api.monobank.ua/personal/statement/", {
-            headers: { "X-Token": token },
+            headers: { "X-Token": newTokenMonobank },
           })
           .pipe(
             catchError((error) => {
