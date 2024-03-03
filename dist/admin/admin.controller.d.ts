@@ -65,7 +65,7 @@ export declare class AdminController {
         status?: undefined;
     }>;
     updateJarMonobank(req: Request, data: {
-        jar: string;
+        jarId: string;
     }): Promise<{
         status: number;
         message: string;

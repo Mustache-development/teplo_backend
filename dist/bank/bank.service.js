@@ -48,18 +48,23 @@ let BankService = class BankService {
         const currentDate = new Date();
         const to = Math.floor(currentDate.getTime() / 1000);
         const from = to - 2682000;
-        const webHookData = {
-            webHookUrl: this.webHookUrl,
-        };
-        try {
-            await (0, rxjs_1.lastValueFrom)(this.httpService.post(this.webHookPostUrl, JSON.stringify(webHookData), {
-                headers: {
-                    "X-Token": monoToken,
-                },
-            }));
+        if (this.webHookUrl) {
+            const webHookData = {
+                webHookUrl: this.webHookUrl,
+            };
+            try {
+                await (0, rxjs_1.lastValueFrom)(this.httpService.post(this.webHookPostUrl, JSON.stringify(webHookData), {
+                    headers: {
+                        "X-Token": monoToken,
+                    },
+                }));
+            }
+            catch (error) {
+                console.log("invalid webHookUrl");
+            }
         }
-        catch (error) {
-            console.log(error);
+        else {
+            console.log("Write to environment 'SERVER_URL' ");
         }
         const { data } = await (0, rxjs_1.lastValueFrom)(this.httpService
             .get(this.statementURL + jar + "/" + from + "/" + to, {
@@ -69,19 +74,26 @@ let BankService = class BankService {
             console.error(error.response.data);
             throw "An error happened!";
         })));
-        const transactions = data.map(function (transaction) {
+        if (data.length > 0) {
+            const transactions = data.map(function (transaction) {
+                return {
+                    trans_id: transaction.id,
+                    trans_type: transaction.amount > 0 ? "Зарахування" : "Списання",
+                    trans_amount: (transaction.amount / 100).toFixed(2),
+                    trans_date: transaction.time,
+                };
+            });
             return {
-                trans_id: transaction.id,
-                trans_type: transaction.amount > 0 ? "Зарахування" : "Списання",
-                trans_amount: (transaction.amount / 100).toFixed(2),
-                trans_date: transaction.time,
+                balance: (data[0].balance / 100).toFixed(2),
+                transactions: transactions,
             };
-        });
-        const statement = {
-            balance: (data[0].balance / 100).toFixed(2),
-            transactions: transactions,
-        };
-        return statement;
+        }
+        else {
+            return {
+                balance: (0 / 100).toFixed(2),
+                transactions: [],
+            };
+        }
     }
 };
 exports.BankService = BankService;

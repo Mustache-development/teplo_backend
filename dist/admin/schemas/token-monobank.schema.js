@@ -23,7 +23,7 @@ __decorate([
     __metadata("design:type", Object)
 ], TokenMonobank.prototype, "activeJar", void 0);
 __decorate([
-    (0, mongoose_1.Prop)([String]),
+    (0, mongoose_1.Prop)({ type: [Object] }),
     __metadata("design:type", Array)
 ], TokenMonobank.prototype, "jars", void 0);
 exports.TokenMonobank = TokenMonobank = __decorate([

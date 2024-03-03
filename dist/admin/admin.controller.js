@@ -37,7 +37,7 @@ let AdminController = class AdminController {
         return this.adminService.updateTokenMonobank(req, data.token);
     }
     updateJarMonobank(req, data) {
-        return this.adminService.updateActiveJar(req, data.jar);
+        return this.adminService.updateActiveJar(req, data.jarId);
     }
 };
 exports.AdminController = AdminController;
@@ -82,7 +82,6 @@ __decorate([
 ], AdminController.prototype, "updateTokenTelegramBot", null);
 __decorate([
     (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
-    (0, swagger_1.ApiQuery)({ name: "newTokenMonobank" }),
     (0, common_1.Put)("token-monobank"),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
@@ -92,7 +91,6 @@ __decorate([
 ], AdminController.prototype, "updateTokenMonobank", null);
 __decorate([
     (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
-    (0, swagger_1.ApiQuery)({ name: "newTokenMonobank" }),
     (0, common_1.Put)("jar-monobank"),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),

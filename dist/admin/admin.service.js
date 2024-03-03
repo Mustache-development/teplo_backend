@@ -208,8 +208,8 @@ let AdminService = class AdminService {
                 };
             }
             const { data } = await (0, rxjs_1.lastValueFrom)(this.httpService
-                .get("https://api.monobank.ua/personal/statement/", {
-                headers: { "X-Token": token },
+                .get("https://api.monobank.ua/personal/client-info", {
+                headers: { "X-Token": newTokenMonobank },
             })
                 .pipe((0, rxjs_1.catchError)((error) => {
                 throw error;
@@ -223,9 +223,13 @@ let AdminService = class AdminService {
                     };
                 });
             }
+            console.log(jars);
             const checkMonobank = await this.tokenMonobankModel.find();
             if (checkMonobank.length > 0) {
-                await this.tokenMonobankModel.findOneAndUpdate({ _id: checkMonobank[0]._id }, { token: newTokenMonobank, jars: jars });
+                await this.tokenMonobankModel.findOneAndUpdate({ _id: checkMonobank[0]._id }, {
+                    token: newTokenMonobank,
+                    jars: jars,
+                });
             }
             else {
                 await this.tokenMonobankModel.create({
@@ -233,6 +237,7 @@ let AdminService = class AdminService {
                     jars: jars,
                 });
             }
+            console.log(await this.tokenMonobankModel.find());
             return {
                 code: 200,
                 message: "Token monobank update. Check jar, please.",
@@ -264,8 +269,10 @@ let AdminService = class AdminService {
                 };
             }
             const checkMonobank = await this.tokenMonobankModel.find();
-            if (checkMonobank.length === 0 &&
-                !checkMonobank[0].jars.includes(newActiveJar)) {
+            const idArr = checkMonobank[0].jars.map(function (jar) {
+                return jar.id;
+            });
+            if (checkMonobank.length === 0 && !idArr.includes(newActiveJar)) {
                 throw "Invalid Monobank token or jar";
             }
             await this.tokenMonobankModel.findOneAndUpdate({ _id: checkMonobank[0]._id }, { activeJar: newActiveJar });

@@ -236,7 +236,7 @@ export class AdminService {
 
       const { data } = await lastValueFrom(
         this.httpService
-          .get<any>("https://api.monobank.ua/personal/statement/", {
+          .get<any>("https://api.monobank.ua/personal/client-info", {
             headers: { "X-Token": newTokenMonobank },
           })
           .pipe(
@@ -256,12 +256,17 @@ export class AdminService {
         });
       }
 
+      console.log(jars);
+
       const checkMonobank = await this.tokenMonobankModel.find();
 
       if (checkMonobank.length > 0) {
         await this.tokenMonobankModel.findOneAndUpdate(
           { _id: checkMonobank[0]._id },
-          { token: newTokenMonobank, jars: jars }
+          {
+            token: newTokenMonobank,
+            jars: jars,
+          }
         );
       } else {
         await this.tokenMonobankModel.create({
@@ -269,6 +274,8 @@ export class AdminService {
           jars: jars,
         });
       }
+
+      console.log(await this.tokenMonobankModel.find());
 
       return {
         code: 200,
@@ -304,10 +311,13 @@ export class AdminService {
       }
 
       const checkMonobank = await this.tokenMonobankModel.find();
-      if (
-        checkMonobank.length === 0 &&
-        !checkMonobank[0].jars.includes(newActiveJar)
-      ) {
+      const idArr = checkMonobank[0].jars.map(function (jar: {
+        id: string;
+        title: string;
+      }) {
+        return jar.id;
+      });
+      if (checkMonobank.length === 0 && !idArr.includes(newActiveJar)) {
         throw "Invalid Monobank token or jar";
       }
 

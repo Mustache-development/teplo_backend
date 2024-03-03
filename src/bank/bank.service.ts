@@ -42,24 +42,28 @@ export class BankService {
     const to = Math.floor(currentDate.getTime() / 1000);
     const from = to - 2682000;
 
-    const webHookData = {
-      webHookUrl: this.webHookUrl,
-    };
+    if (this.webHookUrl) {
+      const webHookData = {
+        webHookUrl: this.webHookUrl,
+      };
 
-    try {
-      await lastValueFrom(
-        this.httpService.post(
-          this.webHookPostUrl,
-          JSON.stringify(webHookData),
-          {
-            headers: {
-              "X-Token": monoToken,
-            },
-          }
-        )
-      );
-    } catch (error) {
-      console.log(error);
+      try {
+        await lastValueFrom(
+          this.httpService.post(
+            this.webHookPostUrl,
+            JSON.stringify(webHookData),
+            {
+              headers: {
+                "X-Token": monoToken,
+              },
+            }
+          )
+        );
+      } catch (error) {
+        console.log("invalid webHookUrl");
+      }
+    } else {
+      console.log("Write to environment 'SERVER_URL' ");
     }
 
     const { data } = await lastValueFrom(
@@ -75,20 +79,25 @@ export class BankService {
         )
     );
 
-    const transactions = data.map(function (transaction: any) {
+    if (data.length > 0) {
+      const transactions = data.map(function (transaction: any) {
+        return {
+          trans_id: transaction.id,
+          trans_type: transaction.amount > 0 ? "Зарахування" : "Списання",
+          trans_amount: (transaction.amount / 100).toFixed(2),
+          trans_date: transaction.time,
+        };
+      });
+
       return {
-        trans_id: transaction.id,
-        trans_type: transaction.amount > 0 ? "Зарахування" : "Списання",
-        trans_amount: (transaction.amount / 100).toFixed(2),
-        trans_date: transaction.time,
+        balance: (data[0].balance / 100).toFixed(2),
+        transactions: transactions,
       };
-    });
-
-    const statement = {
-      balance: (data[0].balance / 100).toFixed(2),
-      transactions: transactions,
-    };
-
-    return statement;
+    } else {
+      return {
+        balance: (0 / 100).toFixed(2),
+        transactions: [],
+      };
+    }
   }
 }

@@ -8,8 +8,13 @@ export class TokenMonobank {
   token: string;
   @Prop({ type: String })
   activeJar: { type: string; default: "0" };
-  @Prop([String])
-  jars: string[];
+  @Prop({ type: [Object] })
+  jars: [
+    {
+      id: string;
+      title: string;
+    },
+  ];
 }
 
 export const TokenMonobankSchema = SchemaFactory.createForClass(TokenMonobank);
