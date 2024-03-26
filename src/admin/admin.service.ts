@@ -8,6 +8,7 @@ import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { IdTelegram } from "./schemas/id-telegram.schema";
 import { TokenMonobank } from "./schemas/token-monobank.schema";
 import { TokenTelegramBot } from "./schemas/token-telegram-bot.schema";
+import { HelpBlock } from "./schemas/help-block.schema";
 const bcrypt = require("bcryptjs");
 import { HttpService } from "@nestjs/axios";
 import { catchError, lastValueFrom } from "rxjs";
@@ -24,6 +25,8 @@ export class AdminService {
     private tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>,
     @InjectModel(TokenMonobank.name)
     private tokenMonobankModel: mongoose.Model<TokenMonobank>,
+    @InjectModel(HelpBlock.name)
+    private helpBlockModel: mongoose.Model<HelpBlock>,
     private readonly httpService: HttpService
   ) {}
 
@@ -330,6 +333,148 @@ export class AdminService {
         code: 200,
         message: "Active jar monobank update",
       };
+    } catch (err) {
+      console.log(err);
+      return {
+        code: 500,
+        message: "error server",
+      };
+    }
+  }
+
+  async createBlock(
+    req: Request,
+    newBlock: {
+      id: string;
+      title: string;
+      text: string;
+      photos: [string];
+    }
+  ) {
+    const token = this.tokenService.getBearerToken(req);
+
+    if (!newBlock || !token) {
+      return {
+        status: 400,
+        message: "Not enough arguments",
+      };
+    }
+
+    try {
+      const tokenData = await this.tokenService.validateJwtToken(token);
+      if (!tokenData.authorization) {
+        return {
+          code: 401,
+          message: "authorization fail",
+        };
+      }
+
+      const helpBlock = await this.helpBlockModel.create(newBlock);
+
+      return helpBlock;
+    } catch (err) {
+      console.log(err);
+      return {
+        code: 500,
+        message: "error server",
+      };
+    }
+  }
+
+  async getAllBlocks(req: Request) {
+    const token = this.tokenService.getBearerToken(req);
+
+    if (!token) {
+      return {
+        status: 400,
+        message: "Not enough arguments",
+      };
+    }
+
+    try {
+      const tokenData = await this.tokenService.validateJwtToken(token);
+      if (!tokenData.authorization) {
+        return {
+          code: 401,
+          message: "authorization fail",
+        };
+      }
+
+      const helpBlocks = await this.helpBlockModel.find();
+
+      return helpBlocks;
+    } catch (err) {
+      console.log(err);
+      return {
+        code: 500,
+        message: "error server",
+      };
+    }
+  }
+
+  async updateBlock(
+    id: string,
+    req: Request,
+    data: {
+      title: string;
+      text: string;
+      photos: [string];
+    }
+  ) {
+    const token = this.tokenService.getBearerToken(req);
+
+    if (!id || !token || !data) {
+      return {
+        status: 400,
+        message: "Not enough arguments",
+      };
+    }
+
+    try {
+      const tokenData = await this.tokenService.validateJwtToken(token);
+      if (!tokenData.authorization) {
+        return {
+          code: 401,
+          message: "authorization fail",
+        };
+      }
+
+      const helpBlock = await this.helpBlockModel.findByIdAndUpdate(id, {
+        ...data,
+      });
+
+      return helpBlock;
+    } catch (err) {
+      console.log(err);
+      return {
+        code: 500,
+        message: "error server",
+      };
+    }
+  }
+
+  async deleteBlock(id: string, req: Request) {
+    const token = this.tokenService.getBearerToken(req);
+
+    if (!id || !token) {
+      return {
+        status: 400,
+        message: "Not enough arguments",
+      };
+    }
+
+    try {
+      const tokenData = await this.tokenService.validateJwtToken(token);
+      if (!tokenData.authorization) {
+        return {
+          code: 401,
+          message: "authorization fail",
+        };
+      }
+
+      await this.helpBlockModel.findByIdAndDelete(id);
+
+      return "HelpBlock with id = " + id + " was deleted";
     } catch (err) {
       console.log(err);
       return {

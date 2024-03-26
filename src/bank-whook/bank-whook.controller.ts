@@ -14,40 +14,49 @@ export class BankWebHookController {
 
   @Post()
   async createPost(@Body() webHook: any) {
-    const checkMonobank = await this.tokenMonobankModel.find();
-    if (checkMonobank.length === 0) {
+    try {
+      const checkMonobank = await this.tokenMonobankModel.find();
+      if (checkMonobank.length === 0) {
+        return {
+          code: 400,
+          message: "Invalid token",
+        };
+      }
+
+      const monoToken = checkMonobank[0].token;
+      if (!monoToken) {
+        return {
+          code: 400,
+          message: "Invalid token",
+        };
+      }
+
+      const jar = !checkMonobank[0].activeJar
+        ? "0"
+        : checkMonobank[0].activeJar;
+
+      const StatementItem = {
+        balance: webHook.data.statementItem.balance.toFixed(2),
+        transaction: {
+          trans_id: webHook.data.statementItem.id,
+          trans_type:
+            webHook.data.statementItem.amount > 0 ? "Зарахування" : "Списання",
+          trans_amount: (webHook.data.statementItem.amount / 100).toFixed(2),
+          trans_date: webHook.data.statementItem.time,
+        },
+      };
+
+      if (jar === webHook.data.account) {
+        this.BankGateway.handlePost(StatementItem);
+      }
+
+      return { msg: "Post created" };
+    } catch (error) {
       return {
-        code: 400,
-        message: "Invalid token",
+        code: 500,
+        message: "error server",
       };
     }
-
-    const monoToken = checkMonobank[0].token;
-    if (!monoToken) {
-      return {
-        code: 400,
-        message: "Invalid token",
-      };
-    }
-
-    const jar = !checkMonobank[0].activeJar ? "0" : checkMonobank[0].activeJar;
-
-    const StatementItem = {
-      balance: webHook.data.statementItem.balance.toFixed(2),
-      transaction: {
-        trans_id: webHook.data.statementItem.id,
-        trans_type:
-          webHook.data.statementItem.amount > 0 ? "Зарахування" : "Списання",
-        trans_amount: (webHook.data.statementItem.amount / 100).toFixed(2),
-        trans_date: webHook.data.statementItem.time,
-      },
-    };
-
-    if (jar === webHook.data.account) {
-      this.BankGateway.handlePost(StatementItem);
-    }
-
-    return { msg: "Post created" };
   }
 
   @Get()

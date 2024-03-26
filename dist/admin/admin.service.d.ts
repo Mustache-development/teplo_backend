@@ -30,6 +30,7 @@ import { UpdatePasswordDto } from "./dto/update-password.dto";
 import { IdTelegram } from "./schemas/id-telegram.schema";
 import { TokenMonobank } from "./schemas/token-monobank.schema";
 import { TokenTelegramBot } from "./schemas/token-telegram-bot.schema";
+import { HelpBlock } from "./schemas/help-block.schema";
 import { HttpService } from "@nestjs/axios";
 export declare class AdminService {
     private readonly tokenService;
@@ -37,8 +38,9 @@ export declare class AdminService {
     private idTelegramModel;
     private tokenTelegramBotModel;
     private tokenMonobankModel;
+    private helpBlockModel;
     private readonly httpService;
-    constructor(tokenService: TokenService, authModel: mongoose.Model<Auth>, idTelegramModel: mongoose.Model<IdTelegram>, tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>, tokenMonobankModel: mongoose.Model<TokenMonobank>, httpService: HttpService);
+    constructor(tokenService: TokenService, authModel: mongoose.Model<Auth>, idTelegramModel: mongoose.Model<IdTelegram>, tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>, tokenMonobankModel: mongoose.Model<TokenMonobank>, helpBlockModel: mongoose.Model<HelpBlock>, httpService: HttpService);
     updateEmail(req: Request, newEmail: string): Promise<{
         status: number;
         message: string;
@@ -92,6 +94,57 @@ export declare class AdminService {
         status?: undefined;
     }>;
     updateActiveJar(req: any, newActiveJar: string): Promise<{
+        status: number;
+        message: string;
+        code?: undefined;
+    } | {
+        code: number;
+        message: string;
+        status?: undefined;
+    }>;
+    createBlock(req: Request, newBlock: {
+        id: string;
+        title: string;
+        text: string;
+        photos: [string];
+    }): Promise<(mongoose.Document<unknown, {}, HelpBlock> & HelpBlock & {
+        _id: mongoose.Types.ObjectId;
+    }) | {
+        status: number;
+        message: string;
+        code?: undefined;
+    } | {
+        code: number;
+        message: string;
+        status?: undefined;
+    }>;
+    getAllBlocks(req: Request): Promise<(mongoose.Document<unknown, {}, HelpBlock> & HelpBlock & {
+        _id: mongoose.Types.ObjectId;
+    })[] | {
+        status: number;
+        message: string;
+        code?: undefined;
+    } | {
+        code: number;
+        message: string;
+        status?: undefined;
+    }>;
+    updateBlock(id: string, req: Request, data: {
+        title: string;
+        text: string;
+        photos: [string];
+    }): Promise<(mongoose.Document<unknown, {}, HelpBlock> & HelpBlock & {
+        _id: mongoose.Types.ObjectId;
+    }) | {
+        status: number;
+        message: string;
+        code?: undefined;
+    } | {
+        code: number;
+        message: string;
+        status?: undefined;
+    }>;
+    deleteBlock(id: string, req: Request): Promise<string | {
         status: number;
         message: string;
         code?: undefined;

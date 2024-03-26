@@ -1,4 +1,14 @@
-import { Controller, Body, Put, Query, Req } from "@nestjs/common";
+import {
+  Controller,
+  Body,
+  Put,
+  Query,
+  Req,
+  Post,
+  Get,
+  Param,
+  Delete,
+} from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { ApiHeaders, ApiQuery } from "@nestjs/swagger";
 import { Request } from "express";
@@ -54,5 +64,48 @@ export class AdminController {
   @Put("jar-monobank")
   updateJarMonobank(@Req() req: Request, @Body() data: { jarId: string }) {
     return this.adminService.updateActiveJar(req, data.jarId);
+  }
+
+  @ApiHeaders([{ name: "Authorization" }])
+  @Post("blocks")
+  createBlock(
+    @Req() req: Request,
+    @Body()
+    data: {
+      id: string;
+      title: string;
+      text: string;
+      photos: [string];
+    }
+  ) {
+    return this.adminService.createBlock(req, data);
+  }
+
+  @ApiHeaders([{ name: "Authorization" }])
+  @Get("blocks")
+  getAllBlocks(@Req() req: Request) {
+    return this.adminService.getAllBlocks(req);
+  }
+
+  @ApiHeaders([{ name: "Authorization" }])
+  @Put("blocks/:id")
+  updateBlock(
+    @Param() id: string,
+    @Req() req: Request,
+    @Body()
+    data: {
+      id: string;
+      title: string;
+      text: string;
+      photos: [string];
+    }
+  ) {
+    return this.adminService.updateBlock(id, req, data);
+  }
+
+  @ApiHeaders([{ name: "Authorization" }])
+  @Delete("blocks/:id")
+  deleteBlock(@Param() id: string, @Req() req: Request) {
+    return this.adminService.deleteBlock(id, req);
   }
 }

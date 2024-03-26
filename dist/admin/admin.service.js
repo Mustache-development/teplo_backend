@@ -21,16 +21,18 @@ const mongoose_2 = require("@nestjs/mongoose");
 const id_telegram_schema_1 = require("./schemas/id-telegram.schema");
 const token_monobank_schema_1 = require("./schemas/token-monobank.schema");
 const token_telegram_bot_schema_1 = require("./schemas/token-telegram-bot.schema");
+const help_block_schema_1 = require("./schemas/help-block.schema");
 const bcrypt = require("bcryptjs");
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 let AdminService = class AdminService {
-    constructor(tokenService, authModel, idTelegramModel, tokenTelegramBotModel, tokenMonobankModel, httpService) {
+    constructor(tokenService, authModel, idTelegramModel, tokenTelegramBotModel, tokenMonobankModel, helpBlockModel, httpService) {
         this.tokenService = tokenService;
         this.authModel = authModel;
         this.idTelegramModel = idTelegramModel;
         this.tokenTelegramBotModel = tokenTelegramBotModel;
         this.tokenMonobankModel = tokenMonobankModel;
+        this.helpBlockModel = helpBlockModel;
         this.httpService = httpService;
     }
     async updateEmail(req, newEmail) {
@@ -289,6 +291,116 @@ let AdminService = class AdminService {
             };
         }
     }
+    async createBlock(req, newBlock) {
+        const token = this.tokenService.getBearerToken(req);
+        if (!newBlock || !token) {
+            return {
+                status: 400,
+                message: "Not enough arguments",
+            };
+        }
+        try {
+            const tokenData = await this.tokenService.validateJwtToken(token);
+            if (!tokenData.authorization) {
+                return {
+                    code: 401,
+                    message: "authorization fail",
+                };
+            }
+            const helpBlock = await this.helpBlockModel.create(newBlock);
+            return helpBlock;
+        }
+        catch (err) {
+            console.log(err);
+            return {
+                code: 500,
+                message: "error server",
+            };
+        }
+    }
+    async getAllBlocks(req) {
+        const token = this.tokenService.getBearerToken(req);
+        if (!token) {
+            return {
+                status: 400,
+                message: "Not enough arguments",
+            };
+        }
+        try {
+            const tokenData = await this.tokenService.validateJwtToken(token);
+            if (!tokenData.authorization) {
+                return {
+                    code: 401,
+                    message: "authorization fail",
+                };
+            }
+            const helpBlocks = await this.helpBlockModel.find();
+            return helpBlocks;
+        }
+        catch (err) {
+            console.log(err);
+            return {
+                code: 500,
+                message: "error server",
+            };
+        }
+    }
+    async updateBlock(id, req, data) {
+        const token = this.tokenService.getBearerToken(req);
+        if (!id || !token || !data) {
+            return {
+                status: 400,
+                message: "Not enough arguments",
+            };
+        }
+        try {
+            const tokenData = await this.tokenService.validateJwtToken(token);
+            if (!tokenData.authorization) {
+                return {
+                    code: 401,
+                    message: "authorization fail",
+                };
+            }
+            const helpBlock = await this.helpBlockModel.findByIdAndUpdate(id, {
+                ...data,
+            });
+            return helpBlock;
+        }
+        catch (err) {
+            console.log(err);
+            return {
+                code: 500,
+                message: "error server",
+            };
+        }
+    }
+    async deleteBlock(id, req) {
+        const token = this.tokenService.getBearerToken(req);
+        if (!id || !token) {
+            return {
+                status: 400,
+                message: "Not enough arguments",
+            };
+        }
+        try {
+            const tokenData = await this.tokenService.validateJwtToken(token);
+            if (!tokenData.authorization) {
+                return {
+                    code: 401,
+                    message: "authorization fail",
+                };
+            }
+            await this.helpBlockModel.findByIdAndDelete(id);
+            return "HelpBlock with id = " + id + " was deleted";
+        }
+        catch (err) {
+            console.log(err);
+            return {
+                code: 500,
+                message: "error server",
+            };
+        }
+    }
 };
 exports.AdminService = AdminService;
 exports.AdminService = AdminService = __decorate([
@@ -297,6 +409,7 @@ exports.AdminService = AdminService = __decorate([
     __param(2, (0, mongoose_2.InjectModel)(id_telegram_schema_1.IdTelegram.name)),
     __param(3, (0, mongoose_2.InjectModel)(token_telegram_bot_schema_1.TokenTelegramBot.name)),
     __param(4, (0, mongoose_2.InjectModel)(token_monobank_schema_1.TokenMonobank.name)),
-    __metadata("design:paramtypes", [token_service_1.TokenService, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model, axios_1.HttpService])
+    __param(5, (0, mongoose_2.InjectModel)(help_block_schema_1.HelpBlock.name)),
+    __metadata("design:paramtypes", [token_service_1.TokenService, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model, mongoose_1.default.Model, axios_1.HttpService])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map

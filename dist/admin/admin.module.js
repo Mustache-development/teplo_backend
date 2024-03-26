@@ -17,6 +17,7 @@ const auth_schema_1 = require("../auth/schemas/auth.schema");
 const id_telegram_schema_1 = require("./schemas/id-telegram.schema");
 const token_telegram_bot_schema_1 = require("./schemas/token-telegram-bot.schema");
 const token_monobank_schema_1 = require("./schemas/token-monobank.schema");
+const help_block_schema_1 = require("./schemas/help-block.schema");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
@@ -30,6 +31,7 @@ exports.AdminModule = AdminModule = __decorate([
                 { name: id_telegram_schema_1.IdTelegram.name, schema: id_telegram_schema_1.IdTelegramSchema },
                 { name: token_telegram_bot_schema_1.TokenTelegramBot.name, schema: token_telegram_bot_schema_1.TokenTelegramBotSchema },
                 { name: token_monobank_schema_1.TokenMonobank.name, schema: token_monobank_schema_1.TokenMonobankSchema },
+                { name: help_block_schema_1.HelpBlock.name, schema: help_block_schema_1.HelpBlockSchema },
             ]),
         ],
         controllers: [admin_controller_1.AdminController],

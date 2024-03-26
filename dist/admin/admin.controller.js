@@ -39,6 +39,18 @@ let AdminController = class AdminController {
     updateJarMonobank(req, data) {
         return this.adminService.updateActiveJar(req, data.jarId);
     }
+    createBlock(req, data) {
+        return this.adminService.createBlock(req, data);
+    }
+    getAllBlocks(req) {
+        return this.adminService.getAllBlocks(req);
+    }
+    updateBlock(id, req, data) {
+        return this.adminService.updateBlock(id, req, data);
+    }
+    deleteBlock(id, req) {
+        return this.adminService.deleteBlock(id, req);
+    }
 };
 exports.AdminController = AdminController;
 __decorate([
@@ -98,6 +110,42 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AdminController.prototype, "updateJarMonobank", null);
+__decorate([
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, common_1.Post)("blocks"),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "createBlock", null);
+__decorate([
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, common_1.Get)("blocks"),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "getAllBlocks", null);
+__decorate([
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, common_1.Put)("blocks/:id"),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "updateBlock", null);
+__decorate([
+    (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
+    (0, common_1.Delete)("blocks/:id"),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], AdminController.prototype, "deleteBlock", null);
 exports.AdminController = AdminController = __decorate([
     (0, common_1.Controller)("api/admin"),
     __metadata("design:paramtypes", [admin_service_1.AdminService])

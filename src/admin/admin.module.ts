@@ -16,6 +16,8 @@ import {
   TokenMonobankSchema,
 } from "./schemas/token-monobank.schema";
 
+import { HelpBlock, HelpBlockSchema } from "./schemas/help-block.schema";
+
 @Module({
   imports: [
     HttpModule,
@@ -25,6 +27,7 @@ import {
       { name: IdTelegram.name, schema: IdTelegramSchema },
       { name: TokenTelegramBot.name, schema: TokenTelegramBotSchema },
       { name: TokenMonobank.name, schema: TokenMonobankSchema },
+      { name: HelpBlock.name, schema: HelpBlockSchema },
     ]),
   ],
   controllers: [AdminController],
