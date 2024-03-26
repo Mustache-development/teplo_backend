@@ -72,7 +72,6 @@ export class AdminController {
     @Req() req: Request,
     @Body()
     data: {
-      id: string;
       title: string;
       text: string;
       photos: [string];

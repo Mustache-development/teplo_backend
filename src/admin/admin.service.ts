@@ -345,7 +345,6 @@ export class AdminService {
   async createBlock(
     req: Request,
     newBlock: {
-      id: string;
       title: string;
       text: string;
       photos: [string];
