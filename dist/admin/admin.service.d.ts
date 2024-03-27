@@ -103,7 +103,6 @@ export declare class AdminService {
         status?: undefined;
     }>;
     createBlock(req: Request, newBlock: {
-        id: string;
         title: string;
         text: string;
         photos: [string];

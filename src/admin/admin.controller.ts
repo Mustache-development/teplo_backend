@@ -89,7 +89,7 @@ export class AdminController {
   @ApiHeaders([{ name: "Authorization" }])
   @Put("blocks/:id")
   updateBlock(
-    @Param() id: string,
+    @Param("id") id: string,
     @Req() req: Request,
     @Body()
     data: {
@@ -104,7 +104,7 @@ export class AdminController {
 
   @ApiHeaders([{ name: "Authorization" }])
   @Delete("blocks/:id")
-  deleteBlock(@Param() id: string, @Req() req: Request) {
+  deleteBlock(@Param("id") id: string, @Req() req: Request) {
     return this.adminService.deleteBlock(id, req);
   }
 }

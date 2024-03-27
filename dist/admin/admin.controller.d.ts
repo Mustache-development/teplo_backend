@@ -101,7 +101,6 @@ export declare class AdminController {
         status?: undefined;
     }>;
     createBlock(req: Request, data: {
-        id: string;
         title: string;
         text: string;
         photos: [string];

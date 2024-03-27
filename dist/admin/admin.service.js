@@ -347,7 +347,7 @@ let AdminService = class AdminService {
     }
     async updateBlock(id, req, data) {
         const token = this.tokenService.getBearerToken(req);
-        if (!id || !token || !data) {
+        if (!id || !token || !data.title) {
             return {
                 status: 400,
                 message: "Not enough arguments",
@@ -361,9 +361,16 @@ let AdminService = class AdminService {
                     message: "authorization fail",
                 };
             }
-            const helpBlock = await this.helpBlockModel.findByIdAndUpdate(id, {
+            if (!(await this.helpBlockModel.findById(id))) {
+                return {
+                    code: 401,
+                    message: "Invalid helpBlock id",
+                };
+            }
+            await this.helpBlockModel.findByIdAndUpdate(id, {
                 ...data,
             });
+            const helpBlock = await this.helpBlockModel.findById(id);
             return helpBlock;
         }
         catch (err) {
@@ -388,6 +395,12 @@ let AdminService = class AdminService {
                 return {
                     code: 401,
                     message: "authorization fail",
+                };
+            }
+            if (!(await this.helpBlockModel.findById(id))) {
+                return {
+                    code: 401,
+                    message: "Invalid helpBlock id",
                 };
             }
             await this.helpBlockModel.findByIdAndDelete(id);

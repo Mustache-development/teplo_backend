@@ -130,7 +130,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
     (0, common_1.Put)("blocks/:id"),
-    __param(0, (0, common_1.Param)()),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Req)()),
     __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -140,7 +140,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiHeaders)([{ name: "Authorization" }]),
     (0, common_1.Delete)("blocks/:id"),
-    __param(0, (0, common_1.Param)()),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
