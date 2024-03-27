@@ -36,7 +36,7 @@ export class BankWebHookController {
         : checkMonobank[0].activeJar;
 
       const StatementItem = {
-        balance: webHook.data.statementItem.balance.toFixed(2),
+        balance: (webHook.data.statementItem.balance / 100).toFixed(2),
         transaction: {
           trans_id: webHook.data.statementItem.id,
           trans_type:
