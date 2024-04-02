@@ -12,7 +12,7 @@ import { BankWebHookModule } from "./bank-whook/bank-whook.module";
 @Module({
   imports: [
     MongooseModule.forRoot(
-      "mongodb+srv://test_education:Fm5xGy5NlfsDXhu0@cluster0.svrxsep.mongodb.net/teplo"
+      "mongodb+srv://test_education:AGGBP5BLRWnmA9u4@cluster0.svrxsep.mongodb.net/teplo"
     ),
     AuthModule,
     AdminModule,
