@@ -32,10 +32,6 @@ export class PostsService {
 
       this.bot = new Telegraf(token[0].token);
 
-      const WEBHOOK_URL = "https://teplo-back.onrender.com/telegram-webhook";
-
-      this.bot.telegram.setWebhook(WEBHOOK_URL);
-
       this.bot.start((ctx) => ctx.reply("Welcome"));
 
       this.bot.on("channel_post", async (ctx) => {
