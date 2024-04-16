@@ -31,7 +31,6 @@ export declare class PostsService {
     private tokenTelegramBotModel;
     private postsModel;
     private bot;
-    private stage;
     private isProcessing;
     constructor(idTelegramModel: mongoose.Model<IdTelegram>, tokenTelegramBotModel: mongoose.Model<TokenTelegramBot>, postsModel: mongoose.Model<Posts>);
     initialize(): Promise<void>;
