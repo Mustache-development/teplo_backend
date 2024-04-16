@@ -18,34 +18,81 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const id_telegram_schema_1 = require("../admin/schemas/id-telegram.schema");
 const token_telegram_bot_schema_1 = require("../admin/schemas/token-telegram-bot.schema");
-const telegraf_1 = require("telegraf");
 const post_schema_1 = require("./schemas/post.schema");
+const fs = require("fs");
+const axios_1 = require("axios");
+const TelegramBot = require("node-telegram-bot-api");
 let PostsService = class PostsService {
     constructor(idTelegramModel, tokenTelegramBotModel, postsModel) {
         this.idTelegramModel = idTelegramModel;
         this.tokenTelegramBotModel = tokenTelegramBotModel;
         this.postsModel = postsModel;
+        this.bot = TelegramBot;
         this.isProcessing = false;
         this.initialize();
     }
     async initialize() {
         try {
-            const token = await this.tokenTelegramBotModel.find();
-            if (!token.length)
+            const token = await this.tokenTelegramBotModel.findOne();
+            if (!token)
                 return;
-            this.bot = new telegraf_1.Telegraf(token[0].token);
-            this.bot.start((ctx) => ctx.reply("Welcome"));
-            this.bot.on("channel_post", async (ctx) => {
+            this.bot = new TelegramBot(token.token, { polling: true });
+            this.bot.on("channel_post", async (msg) => {
                 try {
+                    if (this.isProcessing) {
+                        while (this.isProcessing) {
+                            await new Promise((resolve) => setTimeout(resolve, 1000));
+                        }
+                    }
+                    this.isProcessing = true;
+                    const chatId = msg.chat.id;
+                    const photo = msg.photo;
+                    if (photo) {
+                        const mediaGroupId = msg.media_group_id;
+                        const checkMediaGroup = await this.postsModel
+                            .findOne({
+                            mediagroup: mediaGroupId,
+                        })
+                            .exec();
+                        const photoId = photo[photo.length - 1].file_id;
+                        const fileLink = await this.bot.getFileLink(photoId);
+                        const response = await axios_1.default.get(fileLink, {
+                            responseType: "arraybuffer",
+                        });
+                        if (!fs.existsSync("upload")) {
+                            fs.mkdirSync("upload");
+                        }
+                        fs.writeFileSync(`upload/${photo[photo.length - 1].file_unique_id}.jpg`, response.data);
+                        const photoUrl = `${process.env.SERVER_URL}/upload/${photo[photo.length - 1].file_unique_id}.jpg`;
+                        if (checkMediaGroup) {
+                            await this.postsModel.findOneAndUpdate({ _id: checkMediaGroup._id }, {
+                                photo: [...checkMediaGroup.photo, photoUrl],
+                            });
+                        }
+                        else {
+                            await this.postsModel.create({
+                                photo: [photoUrl],
+                                mediagroup: mediaGroupId,
+                                text: msg.caption || "",
+                            });
+                        }
+                    }
+                    else {
+                        await this.postsModel.create({
+                            text: msg.text || "",
+                        });
+                    }
                 }
                 catch (err) {
-                    console.error("Error processing message:", err);
+                    console.log(err);
+                }
+                finally {
+                    this.isProcessing = false;
                 }
             });
-            this.bot.launch();
         }
         catch (err) {
-            console.error("Error initializing bot:", err);
+            console.log(err);
         }
     }
     async getPosts() {

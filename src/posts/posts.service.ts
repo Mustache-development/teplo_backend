@@ -3,15 +3,14 @@ import { InjectModel } from "@nestjs/mongoose";
 import mongoose from "mongoose";
 import { IdTelegram } from "src/admin/schemas/id-telegram.schema";
 import { TokenTelegramBot } from "src/admin/schemas/token-telegram-bot.schema";
-import { Composer, Context, Telegraf } from "telegraf";
 import { Posts } from "./schemas/post.schema";
 import * as fs from "fs";
 import axios from "axios";
+const TelegramBot = require("node-telegram-bot-api");
 
 @Injectable()
 export class PostsService {
-  private bot: Telegraf;
-  private stage: Composer<Context>;
+  private bot = TelegramBot;
   private isProcessing: boolean = false;
   constructor(
     @InjectModel(IdTelegram.name)
@@ -26,15 +25,13 @@ export class PostsService {
 
   async initialize() {
     try {
-      const token = await this.tokenTelegramBotModel.find();
+      const token = await this.tokenTelegramBotModel.findOne();
 
-      if (!token.length) return;
+      if (!token) return;
 
-      this.bot = new Telegraf(token[0].token);
+      this.bot = new TelegramBot(token.token, { polling: true });
 
-      this.bot.start((ctx) => ctx.reply("Welcome"));
-
-      this.bot.on("channel_post", async (ctx) => {
+      this.bot.on("channel_post", async (msg) => {
         try {
           if (this.isProcessing) {
             while (this.isProcessing) {
@@ -43,112 +40,53 @@ export class PostsService {
           }
 
           this.isProcessing = true;
-          if ((ctx.update.channel_post as any)?.photo) {
-            const photo = (ctx.update.channel_post as any)?.photo;
+          const chatId = msg.chat.id;
+          const photo = msg.photo;
 
-            if ((ctx.update.channel_post as any)?.media_group_id) {
-              const mediagroup = (ctx.update.channel_post as any)
-                ?.media_group_id;
+          if (photo) {
+            const mediaGroupId = msg.media_group_id;
+            const checkMediaGroup = await this.postsModel
+              .findOne({
+                mediagroup: mediaGroupId,
+              })
+              .exec();
 
-              const checkMediaGroup = await this.postsModel
-                .findOne({
-                  mediagroup: mediagroup,
-                })
-                .exec();
+            const photoId = photo[photo.length - 1].file_id;
+            const fileLink = await this.bot.getFileLink(photoId);
+            const response = await axios.get(fileLink, {
+              responseType: "arraybuffer",
+            });
 
-              if (checkMediaGroup) {
-                const check = await ctx.telegram.getFileLink(
-                  photo[photo.length - 1].file_id
-                );
+            if (!fs.existsSync("upload")) {
+              fs.mkdirSync("upload");
+            }
 
-                const response = await axios.get(check.href, {
-                  responseType: "arraybuffer",
-                });
+            fs.writeFileSync(
+              `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
+              response.data
+            );
 
-                if (!fs.existsSync("upload")) {
-                  fs.mkdirSync("upload");
+            const photoUrl = `${process.env.SERVER_URL}/upload/${
+              photo[photo.length - 1].file_unique_id
+            }.jpg`;
+
+            if (checkMediaGroup) {
+              await this.postsModel.findOneAndUpdate(
+                { _id: checkMediaGroup._id },
+                {
+                  photo: [...checkMediaGroup.photo, photoUrl],
                 }
-
-                fs.writeFileSync(
-                  `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
-                  response.data
-                );
-
-                await this.postsModel
-                  .findOneAndUpdate(
-                    { _id: checkMediaGroup._id },
-                    {
-                      photo: [
-                        ...checkMediaGroup.photo,
-                        `${process.env.SERVER_URL}/upload/${
-                          photo[photo.length - 1].file_unique_id
-                        }.jpg`,
-                      ],
-                    }
-                  )
-                  .exec();
-              } else {
-                const check = await ctx.telegram.getFileLink(
-                  photo[photo.length - 1].file_id
-                );
-
-                const response = await axios.get(check.href, {
-                  responseType: "arraybuffer",
-                });
-
-                if (!fs.existsSync("upload")) {
-                  fs.mkdirSync("upload");
-                }
-
-                fs.writeFileSync(
-                  `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
-                  response.data
-                );
-
-                await this.postsModel.create({
-                  photo: [
-                    `${process.env.SERVER_URL}/upload/${
-                      photo[photo.length - 1].file_unique_id
-                    }.jpg`,
-                  ],
-                  mediagroup: mediagroup,
-                  text: (ctx.update.channel_post as any)?.caption
-                    ? (ctx.update.channel_post as any)?.caption
-                    : "",
-                });
-              }
+              );
             } else {
-              const check = await ctx.telegram.getFileLink(
-                photo[photo.length - 1].file_id
-              );
-
-              const response = await axios.get(check.href, {
-                responseType: "arraybuffer",
-              });
-
-              if (!fs.existsSync("upload")) {
-                fs.mkdirSync("upload");
-              }
-
-              fs.writeFileSync(
-                `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
-                response.data
-              );
-
               await this.postsModel.create({
-                photo: [
-                  `${process.env.SERVER_URL}/upload/${
-                    photo[photo.length - 1].file_unique_id
-                  }.jpg`,
-                ],
-                text: (ctx.update.channel_post as any)?.caption
-                  ? (ctx.update.channel_post as any)?.caption
-                  : "",
+                photo: [photoUrl],
+                mediagroup: mediaGroupId,
+                text: msg.caption || "",
               });
             }
           } else {
             await this.postsModel.create({
-              text: (ctx.update.channel_post as any).text,
+              text: msg.text || "",
             });
           }
         } catch (err) {
@@ -157,7 +95,6 @@ export class PostsService {
           this.isProcessing = false;
         }
       });
-      this.bot.launch();
     } catch (err) {
       console.log(err);
     }
