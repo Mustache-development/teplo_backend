@@ -6,6 +6,7 @@ import { join } from "path";
 import { config } from "dotenv";
 config();
 
+// main
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
