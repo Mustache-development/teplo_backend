@@ -23,7 +23,7 @@ exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forRoot("mongodb+srv://test_education:JUSLrjhcpQ2nHjak@cluster0.svrxsep.mongodb.net/teplo"),
+            mongoose_1.MongooseModule.forRoot("mongodb+srv://itsushkoandriy:Mymongo14@teplocluster.kshfmdi.mongodb.net/TeploDB?retryWrites=true&w=majority&appName=TeploCluster"),
             auth_module_1.AuthModule,
             admin_module_1.AdminModule,
             posts_module_1.PostsModule,
