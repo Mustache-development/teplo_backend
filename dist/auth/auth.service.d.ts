@@ -22,6 +22,7 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
+import { OnModuleInit } from "@nestjs/common";
 import { CreateAuthDto } from "./dto/create-auth.dto";
 import { TokenService } from "src/token/token.service";
 import { LoginAuthDto } from "./dto/login-auth.dto";
@@ -29,11 +30,12 @@ import mongoose from "mongoose";
 import { Auth } from "./schemas/auth.schema";
 import { Request } from "express";
 import { ForgotDto } from "./dto/forgot.dto";
-export declare class AuthService {
+export declare class AuthService implements OnModuleInit {
     private readonly tokenService;
     private authModel;
     private forgotModel;
     constructor(tokenService: TokenService, authModel: mongoose.Model<Auth>, forgotModel: mongoose.Model<Auth>);
+    onModuleInit(): Promise<void>;
     create(data: CreateAuthDto): Promise<{
         status: number;
         message: string;

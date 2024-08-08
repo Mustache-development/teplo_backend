@@ -15,7 +15,7 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: ["http://localhost:3000", "https://teplo-na-peredovu.netlify.app", "https://teplo-jade.vercel.app"],
+    origin: ["http://localhost:3000", "https://teplo-na-peredovu.netlify.app", "https://teplo-jade.vercel.app", "https://subtle-rabanadas-560bb7.netlify.app/"],
     methods: "GET,PUT,POST,DELETE",
     allowedHeaders: "Content-Type, Authorization",
   });
@@ -29,6 +29,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
   await app.listen(3000);
-  
+
 }
 bootstrap();

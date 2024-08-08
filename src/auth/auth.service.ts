@@ -19,7 +19,7 @@ export class AuthService {
     private authModel: mongoose.Model<Auth>,
     @InjectModel(Forgot.name)
     private forgotModel: mongoose.Model<Auth>
-  ) {}
+  ) { }
 
   async create(data: CreateAuthDto) {
     if (!data.email || !data.password) {

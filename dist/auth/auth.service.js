@@ -27,6 +27,18 @@ let AuthService = class AuthService {
         this.authModel = authModel;
         this.forgotModel = forgotModel;
     }
+    async onModuleInit() {
+        const defaultEmail = 'admin@example.com';
+        const defaultPassword = 'securepassword';
+        const adminUser = await this.authModel.findOne({ email: defaultEmail });
+        if (!adminUser) {
+            const hashedPassword = bcrypt.hashSync(defaultPassword, 10);
+            await this.authModel.create({
+                email: defaultEmail,
+                password: hashedPassword,
+            });
+        }
+    }
     async create(data) {
         if (!data.email || !data.password) {
             return {
