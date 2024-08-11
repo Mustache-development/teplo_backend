@@ -10,7 +10,9 @@ config();
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.useStaticAssets(join(__dirname, "..", "upload"), {
+  console.log('route to upload', join(__dirname, "..", "..", "upload"));
+
+  app.useStaticAssets(join(__dirname, "..", "..", "upload"), {
     prefix: "/upload",
   });
 
