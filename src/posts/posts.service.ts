@@ -70,6 +70,8 @@ export class PostsService {
               console.error(`Failed to save the file at ${filePath}`);
             }
 
+            console.log('SERVER_URL:', process.env.SERVER_URL);
+
             const photoUrl = `${process.env.SERVER_URL}/upload/${photo[photo.length - 1].file_unique_id
               }.jpg`;
 
