@@ -11,9 +11,7 @@ import { BankWebHookModule } from "./bank-whook/bank-whook.module";
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      "mongodb+srv://itsushkoandriy:Mymongo14@teplocluster.kshfmdi.mongodb.net/TeploDB?retryWrites=true&w=majority&appName=TeploCluster"
-    ),
+    MongooseModule.forRoot(process.env.MONGO_URI),
     AuthModule,
     AdminModule,
     PostsModule,
