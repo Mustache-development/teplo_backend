@@ -61,14 +61,17 @@ export class PostsService {
               fs.mkdirSync("upload");
             }
 
-            fs.writeFileSync(
-              `upload/${photo[photo.length - 1].file_unique_id}.jpg`,
-              response.data
-            );
+            const filePath = `upload/${photo[photo.length - 1].file_unique_id}.jpg`;
+            fs.writeFileSync(filePath, response.data);
 
-            const photoUrl = `${process.env.SERVER_URL}/upload/${
-              photo[photo.length - 1].file_unique_id
-            }.jpg`;
+            if (fs.existsSync(filePath)) {
+              console.log(`File saved successfully at ${filePath}`);
+            } else {
+              console.error(`Failed to save the file at ${filePath}`);
+            }
+
+            const photoUrl = `${process.env.SERVER_URL}/upload/${photo[photo.length - 1].file_unique_id
+              }.jpg`;
 
             if (checkMediaGroup) {
               await this.postsModel.findOneAndUpdate(
