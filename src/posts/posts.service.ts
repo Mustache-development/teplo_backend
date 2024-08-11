@@ -61,7 +61,8 @@ export class PostsService {
               fs.mkdirSync("upload");
             }
 
-            const filePath = `upload/${photo[photo.length - 1].file_unique_id}.jpg`;
+            const filePath = `/opt/render/project/src/upload/${photo[photo.length - 1].file_unique_id}.jpg`;
+
             fs.writeFileSync(filePath, response.data);
 
             if (fs.existsSync(filePath)) {
