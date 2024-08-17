@@ -7,8 +7,8 @@ export class Posts {
   @Prop({ default: "" })
   text: string;
 
-  @Prop({ default: [] })
-  photo: [];
+  @Prop({ type: [String], default: [] })
+  photo: string[];
 
   @Prop({ default: "" })
   mediagroup: string;

@@ -6,6 +6,7 @@ import { TokenTelegramBot } from "src/admin/schemas/token-telegram-bot.schema";
 import { Posts } from "./schemas/post.schema";
 import * as fs from "fs";
 import axios from "axios";
+import sharp from 'sharp';
 const TelegramBot = require("node-telegram-bot-api");
 
 @Injectable()
@@ -57,35 +58,26 @@ export class PostsService {
               responseType: "arraybuffer",
             });
 
-            if (!fs.existsSync("upload")) {
-              fs.mkdirSync("upload");
-            }
+            const image = sharp(response.data);
+            const metadata = await image.metadata();
+            const base64Image = await image.toBuffer().then(buffer => buffer.toString('base64'));
 
-            const filePath = `/opt/render/project/src/upload/${photo[photo.length - 1].file_unique_id}.jpg`;
-
-            fs.writeFileSync(filePath, response.data);
-
-            if (fs.existsSync(filePath)) {
-              console.log(`File saved successfully at ${filePath}`);
-            } else {
-              console.error(`Failed to save the file at ${filePath}`);
-            }
-
-            console.log('SERVER_URL:', process.env.SERVER_URL);
-
-            const photoUrl = `${process.env.SERVER_URL}/upload/${photo[photo.length - 1].file_unique_id
-              }.jpg`;
+            const imageData = {
+              base64Image,
+              width: metadata.width || 800,
+              height: metadata.height || 600,
+            };
 
             if (checkMediaGroup) {
               await this.postsModel.findOneAndUpdate(
                 { _id: checkMediaGroup._id },
                 {
-                  photo: [...checkMediaGroup.photo, photoUrl],
+                  $push: { photo: imageData },
                 }
               );
             } else {
               await this.postsModel.create({
-                photo: [photoUrl],
+                photo: [imageData],
                 mediagroup: mediaGroupId,
                 text: msg.caption || "",
               });
