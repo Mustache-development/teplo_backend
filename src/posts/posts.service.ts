@@ -6,7 +6,7 @@ import { TokenTelegramBot } from "src/admin/schemas/token-telegram-bot.schema";
 import { Posts } from "./schemas/post.schema";
 import * as fs from "fs";
 import axios from "axios";
-import sharp from 'sharp';
+const sharp = require('sharp');
 const TelegramBot = require("node-telegram-bot-api");
 
 @Injectable()
