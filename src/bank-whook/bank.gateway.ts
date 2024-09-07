@@ -6,7 +6,12 @@ import {
 } from "@nestjs/websockets";
 import { Server } from "socket.io";
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+})
 export class BankGateway {
   @WebSocketServer() server: Server;
 

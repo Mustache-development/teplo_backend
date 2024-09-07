@@ -10,11 +10,12 @@ export class BankWebHookController {
     @InjectModel(TokenMonobank.name)
     private tokenMonobankModel: mongoose.Model<TokenMonobank>,
     private readonly BankGateway: BankGateway
-  ) {}
+  ) { }
 
   @Post()
   async createPost(@Body() webHook: any) {
     try {
+      console.log("Received webhook from Monobank:", webHook);
       const checkMonobank = await this.tokenMonobankModel.find();
       if (checkMonobank.length === 0) {
         return {
