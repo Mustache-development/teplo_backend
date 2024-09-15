@@ -4,7 +4,6 @@ import {
   SubscribeMessage,
   MessageBody,
 } from "@nestjs/websockets";
-import { log } from "console";
 import { Server } from "socket.io";
 
 @WebSocketGateway({
@@ -21,11 +20,15 @@ export class BankGateway {
   onModuleInit() {
     this.interval = setInterval(() => {
       const testData = {
-        trans_id: Date.now(),
-        trans_type: Math.random() > 0.5 ? "Зарахування" : "Списання",
-        trans_amount: (Math.random() * 1000).toFixed(2),
-        trans_date: new Date().toISOString(),
+        balance: (Math.random() * 10000).toFixed(2),
+        transaction: {
+          trans_id: Date.now().toString(),
+          trans_type: Math.random() > 0.5 ? "Зарахування" : "Списання",
+          trans_amount: (Math.random() * 1000).toFixed(2),
+          trans_date: Math.floor(Date.now() / 1000),
+        }
       };
+
       this.server.emit("bankWebHook", testData);
       console.log("emit: ", testData);
     }, 10000);
