@@ -13,7 +13,7 @@ export class BankService {
     private readonly httpService: HttpService,
     @InjectModel(TokenMonobank.name)
     private tokenMonobankModel: mongoose.Model<TokenMonobank>
-  ) {}
+  ) { }
 
   statementURL = "https://api.monobank.ua/personal/statement/";
   webHookPostUrl = "https://api.monobank.ua/personal/webhook";
@@ -84,18 +84,18 @@ export class BankService {
         return {
           trans_id: transaction.id,
           trans_type: transaction.amount > 0 ? "Зарахування" : "Списання",
-          trans_amount: (transaction.amount / 100).toFixed(2),
+          trans_amount: (transaction.amount / 100).toFixed(0),
           trans_date: transaction.time,
         };
       });
 
       return {
-        balance: (data[0].balance / 100).toFixed(2),
+        balance: (data[0].balance / 100).toFixed(0),
         transactions: transactions,
       };
     } else {
       return {
-        balance: (0 / 100).toFixed(2),
+        balance: (0 / 100).toFixed(0),
         transactions: [],
       };
     }

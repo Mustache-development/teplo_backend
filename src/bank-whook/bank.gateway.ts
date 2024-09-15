@@ -20,11 +20,11 @@ export class BankGateway {
   onModuleInit() {
     this.interval = setInterval(() => {
       const testData = {
-        balance: (Math.random() * 10000).toFixed(2),
+        balance: (Math.random() * 10000).toFixed(0),
         transaction: {
           trans_id: Date.now().toString(),
           trans_type: Math.random() > 0.5 ? "Зарахування" : "Списання",
-          trans_amount: (Math.random() * 1000).toFixed(2),
+          trans_amount: (Math.random() * 1000).toFixed(0),
           trans_date: Math.floor(Date.now() / 1000),
         }
       };
