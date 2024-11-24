@@ -98,13 +98,22 @@ export class PostsService {
     }
   }
 
-  async getPosts() {
+  async getPosts(limit: number, offset: number) {
+    console.log("Start getPosts");
     try {
-      const allPosts = await this.postsModel.find();
+      const posts = await this.postsModel
+        .find()
+        .skip(offset)
+        .limit(limit)
+        .exec();
+
+      const totalPosts = await this.postsModel.countDocuments();
+      console.log('posts: ', posts);
 
       return {
         code: 200,
-        posts: allPosts,
+        posts: posts,
+        totalPosts,
       };
     } catch (err) {
       console.log(err);
