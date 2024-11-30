@@ -103,6 +103,7 @@ export class PostsService {
     try {
       const posts = await this.postsModel
         .find()
+        .sort({ _id: -1 })
         .skip(offset)
         .limit(limit)
         .exec();
